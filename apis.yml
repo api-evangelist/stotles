@@ -1,8 +1,16 @@
 aid: stotles
 name: Stotles
-description: Stotles is a company surfaced as a portfolio company of seedcamp, speedinvest and added to
-  the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment
-  pipeline.
+description: >-
+  Stotles is a B2G (business-to-government) public sector procurement and sales
+  intelligence platform for the UK and Ireland. It aggregates procurement
+  notices, contract awards, framework agreements, buyer spend history, and
+  verified decision-maker contacts from public sources such as Find a Tender,
+  Contracts Finder, Digital Marketplace, TED, and Public Contracts Scotland,
+  then layers tender discovery, market intelligence, AI-assisted bid
+  qualification (Bid Studio), account targeting (Sales Studio), and pipeline
+  management on top so suppliers can find, qualify, and win government
+  contracts. Delivered as a SaaS web application; no public developer API is
+  published as of this writing.
 url: https://raw.githubusercontent.com/api-evangelist/stotles/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -11,11 +19,30 @@ x-backed-by:
 - speedinvest
 x-tier: stub
 x-tier-reason: portfolio-lead
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source: []
+  generated: '2026-07-22'
+  method: derived
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
+image: https://cdn.prod.website-files.com/67caf809eabcc3eb572f7bc7/68149b136c8bcfe66f0b8b2f_SEO%20Image%20-%20Homepage.jpg
 tags:
 - Company
+- Procurement
+- Public Sector
+- Government
+- Tenders
+- Sales Intelligence
+- B2G
+- Market Intelligence
 apis: []
 maintainers:
 - FN: Kin Lane
@@ -24,4 +51,39 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: http://stotles.com
+  url: https://www.stotles.com
+- type: Documentation
+  url: https://help.stotles.com/
+- type: Support
+  url: https://help.stotles.com/
+- type: HelpCenter
+  url: https://help.stotles.com/
+- type: GettingStarted
+  url: https://app.stotles.com/get-started
+- type: SignUp
+  url: https://app.stotles.com/get-started
+- type: Login
+  url: https://app.stotles.com/users/sign_in
+- type: Pricing
+  url: https://www.stotles.com/pricing
+- type: Blog
+  url: https://www.stotles.com/resources
+- type: TermsOfService
+  url: https://www.stotles.com/terms-and-conditions
+- type: PrivacyPolicy
+  url: https://www.stotles.com/privacy-policy
+- type: TrustCenter
+  url: https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm
+- type: Compliance
+  url: https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm
+- type: Conformance
+  url: conformance/stotles-conformance.yml
+- type: DomainSecurity
+  url: security/stotles-domain-security.yml
+- type: LLMsTxt
+  url: llms/stotles-llms.txt
+x-enrichment:
+  date: '2026-07-21'
+  status: minimal
+  artifacts_added: 4
+  pass: local-v1

@@ -1,0 +1,24 @@
+# Stotles
+
+> Stotles is a B2G (business-to-government) public sector procurement and sales intelligence platform for the UK and Ireland. It aggregates procurement notices, awards, framework agreements, buyer spend, and decision-maker contacts from sources such as Find a Tender, Contracts Finder, Digital Marketplace, TED, and Public Contracts Scotland, then layers tender discovery, market intelligence, AI-assisted bid qualification, and pipeline management on top so suppliers can find and win government contracts.
+
+Stotles is delivered as a SaaS web application (app.stotles.com). No public developer API or OpenAPI specification is published as of this writing; the platform integrates with CRMs (Salesforce, HubSpot) and collaboration tools (Microsoft Teams, SharePoint, Slack, Google Drive) rather than exposing a public API surface.
+
+## Product
+- [Platform overview](https://www.stotles.com/platform): Tender discovery, market intelligence, Sales Studio, Bid Studio, and pipeline management.
+- [Data coverage](https://www.stotles.com/data): 8M+ procurement notices and awards from 15K+ public buying organizations.
+- [Pricing](https://www.stotles.com/pricing): Free, Basic, Growth, and Expert tiers across Sales Studio, Bid Studio, and the combined B2G Growth Engine.
+
+## Get started
+- [Sign up / Get started](https://app.stotles.com/get-started)
+- [Login](https://app.stotles.com/users/sign_in)
+- [Help center](https://help.stotles.com/)
+
+## Docs & resources
+- [Resource hub / Blog](https://www.stotles.com/resources)
+- [Public sector framework database](https://www.stotles.com/ppc/public-sector-framework-database)
+
+## Trust & legal
+- [Trust center (Vanta)](https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm): SOC 2 Type II, GDPR.
+- [Privacy policy](https://www.stotles.com/privacy-policy)
+- [Terms and conditions](https://www.stotles.com/terms-and-conditions)
