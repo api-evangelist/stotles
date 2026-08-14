@@ -9,30 +9,47 @@ description: >-
   then layers tender discovery, market intelligence, AI-assisted bid
   qualification (Bid Studio), account targeting (Sales Studio), and pipeline
   management on top so suppliers can find, qualify, and win government
-  contracts. Delivered as a SaaS web application; no public developer API is
-  published as of this writing.
+  contracts. Delivered as a SaaS web application at app.stotles.com, and — since
+  2026 — as a programmable surface: the Stotles Public API is a documented
+  OpenAPI 3.1.0 REST service at api.stotles.com/v1 covering notices, buyers,
+  suppliers and framework agreements, alongside a hosted Model Context Protocol
+  server at api.stotles.com/mcp that brings the same market data into AI chat
+  tools and agents. Both authenticate with a static x-api-key header; keys are
+  issued by a Customer Success Manager rather than self-serve, and MCP access is
+  in beta behind a waitlist.
 url: https://raw.githubusercontent.com/api-evangelist/stotles/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - seedcamp
 - speedinvest
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: enriched
+x-tier-reason: >-
+  Live OpenAPI 3.1.0 and hosted MCP server discovered on the API host root
+  2026-08-14; a prior round wrongly recorded "no public developer API".
 accessModel:
-  pricing: unknown
-  onboarding: unknown
+  pricing: published
+  onboarding: requires-approval
   trial: false
   try_now: false
   public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
+  label: Requires approval
+  confidence: high
+  source:
+  - https://www.stotles.com/pricing
+  - https://www.stotles.com/integrations
+  - https://api.stotles.com/v1/openapi.json
+  generated: '2026-08-14'
+  method: searched
+  note: >-
+    The PRODUCT has a free, self-serve tier (£0/month, "Get started") and
+    published list prices. The API does not: no pricing tier mentions API
+    access, keys are "issued by Stotles — ask your Customer Success Manager",
+    the API CTA is "Book a call" and the MCP CTA is "Join the waitlist". API
+    access is an entitlement of a commercial relationship, not a purchase.
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-21'
+modified: '2026-08-14'
 image: https://cdn.prod.website-files.com/67caf809eabcc3eb572f7bc7/68149b136c8bcfe66f0b8b2f_SEO%20Image%20-%20Homepage.jpg
 tags:
 - Company
@@ -43,7 +60,98 @@ tags:
 - Sales Intelligence
 - B2G
 - Market Intelligence
-apis: []
+- API
+- OpenAPI
+- MCP
+- Agent Native
+- Contract Awards
+- Framework Agreements
+- CPV
+- United Kingdom
+- Ireland
+- GovTech
+apis:
+- name: Stotles Public API
+  description: >-
+    REST API giving programmatic access to UK and Ireland public sector procurement data — notices,
+    buyers, suppliers and framework agreements — as JSON over HTTPS. Eight read-only operations
+    across four resources, each with a cursor-paginated /search and a by-UUID lookup. Notices carry
+    the full procurement lifecycle (forward-plan pipeline through open tender to awarded and expired
+    contract) with lots, contracts, awarded suppliers, CPV classification codes and estimated
+    values. Filterable by keyword, CPV code, buyer, supplier, framework, stage, value band and four
+    independent date ranges. Authenticated with a static x-api-key header issued by a Stotles
+    Customer Success Manager. RFC 9457 problem+json errors, opaque-cursor pagination, and a
+    published additive-only versioning contract.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/v1
+  tags:
+  - procurement
+  - public-sector
+  - government
+  - tenders
+  - contract-awards
+  - framework-agreements
+  - market-intelligence
+  - sales-intelligence
+  - b2g
+  - united-kingdom
+  - ireland
+  - cpv
+  - openapi
+  - rest
+  properties:
+  - type: OpenAPI
+    url: openapi/stotles-public-api-openapi.yml
+  - type: Documentation
+    url: https://api.stotles.com/v1/openapi.json
+  - type: APIReference
+    url: https://api.stotles.com/v1/openapi.json
+  - type: Overlay
+    url: overlays/stotles-public-api-overlay.yaml
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
+  - type: Conventions
+    url: conventions/stotles-conventions.yml
+  - type: ErrorCatalog
+    url: errors/stotles-problem-types.yml
+  - type: DataModel
+    url: data-model/stotles-data-model.yml
+  - type: RateLimits
+    url: rate-limits/stotles-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/stotles-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/stotles-lifecycle.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+- name: Stotles MCP Server
+  description: >-
+    Hosted, remote Model Context Protocol server exposing Stotles public sector market data to AI
+    chat tools and agents. Streamable-HTTP transport at api.stotles.com/mcp, authenticated with the
+    same x-api-key header as the REST API. Described by Stotles as letting teams "explore the market
+    in natural language and pull the insights they need without leaving their tools". In beta behind
+    a public waitlist; tools/list is auth-gated, so the live tool schemas require an issued key.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/mcp
+  tags:
+  - mcp
+  - agent-native
+  - procurement
+  - public-sector
+  - market-intelligence
+  - b2g
+  - united-kingdom
+  properties:
+  - type: MCPServer
+    url: mcp/stotles-mcp.yml
+  - type: MCPServer
+    url: https://api.stotles.com/mcp
+  - type: ToolCrosswalk
+    url: mcp/stotles-tool-crosswalk.yml
+  - type: Documentation
+    url: https://www.stotles.com/integrations
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -82,8 +190,40 @@ common:
   url: security/stotles-domain-security.yml
 - type: LLMsTxt
   url: llms/stotles-llms.txt
+- type: LLMsTxt
+  url: https://www.stotles.com/llms.txt
+- type: TrustCenter
+  url: security/stotles-trust-center.yml
+- type: GitHubOrganization
+  url: https://github.com/Stotles
+- type: Packages
+  url: packages/stotles-packages.yml
+- type: Plans
+  url: plans/stotles-plans-pricing.yml
+- type: Integrations
+  url: https://www.stotles.com/integrations
+# DELIBERATELY NOT EMITTED (2026-08-14) — each of these was checked and genuinely missed.
+# Emitting the pointer anyway would credit Stotles with a surface it does not serve:
+#   WellKnown / SecurityTxt — every /.well-known/ path 404s on all four hosts
+#                             (probe record: well-known/stotles-well-known.yml)
+#   Security                — no security.txt, no bug bounty, no disclosure contact;
+#                             the site footer's /security link itself returns 404
+#   StatusPage              — status.stotles.com does not resolve; stotles.statuspage.io
+#                             redirects to Atlassian's marketing site
+#   ChangeLog               — www.stotles.com/changelog is an unpopulated Webflow template
+#                             (changelog/stotles-changelog.yml)
+#   SDKs                    — no API client library in any registry, in any language
+#                             (packages/stotles-packages.yml)
+#   Idempotency             — N/A: all 8 operations are GET, so there is no write to protect
+#   AgentCard               — /.well-known/agent-card.json and /agent.json 404 on all hosts
+#   AsyncAPI / Webhooks     — no event, streaming or webhook surface is published
 x-enrichment:
-  date: '2026-07-21'
-  status: minimal
-  artifacts_added: 4
+  date: '2026-08-14'
+  status: enriched
+  artifacts_added: 21
   pass: local-v1
+  note: >-
+    Corrected a false negative. The 2026-07-21 round recorded "no public developer API is
+    published"; STEP 0b contract discovery against the API HOST ROOT found a live OpenAPI 3.1.0
+    (8 operations, RFC 9457 errors, cursor pagination) and a remote MCP server. Ownership verified:
+    info.title "Stotles Public API", servers[0] https://api.stotles.com.
