@@ -47,7 +47,7 @@ accessModel:
     access, keys are "issued by Stotles — ask your Customer Success Manager",
     the API CTA is "Book a call" and the MCP CTA is "Join the waitlist". API
     access is an entitlement of a commercial relationship, not a purchase.
-specificationVersion: '0.20'
+specificationVersion: '0.23'
 created: '2026-07-17'
 modified: '2026-08-14'
 image: https://cdn.prod.website-files.com/67caf809eabcc3eb572f7bc7/68149b136c8bcfe66f0b8b2f_SEO%20Image%20-%20Homepage.jpg
