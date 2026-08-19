@@ -1,0 +1,95 @@
+generated: '2026-08-14'
+method: probed
+source: >-
+  Live unauthenticated GET probes of every Stotles host named in apis.yml and in the
+  OpenAPI servers[] block, run 2026-08-14.
+summary:
+  hosts_probed: 4
+  paths_probed: 24
+  documents_found: 0
+  note: >-
+    NOT ONE /.well-known/ path returns a document on any Stotles host. This file records the
+    absence, and DELIBERATELY EMITS NO `WellKnown` OR `SecurityTxt` POINTER in apis.yml — the
+    pointer asserts the provider serves that surface, and Stotles does not. The one machine-readable
+    discovery document Stotles does serve is /llms.txt on www.stotles.com (see llms/), which is a
+    root-path file, not a /.well-known/ one.
+  false_positive_warning: >-
+    www.stotles.com answers EVERY /.well-known/* path with a Webflow catch-all page
+    ("Invalid .well-known request", 88 bytes, text/html) and app.stotles.com answers with a
+    1,151-byte SPA shell. Both carry HTTP 404 today, but if either edge ever flips to a soft-200
+    these must still be read as misses: an HTML shell is not a document.
+
+hosts:
+  - host: api.stotles.com
+    role: production API host (OpenAPI servers[0])
+    paths:
+      - {path: /.well-known/security.txt, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/openid-configuration, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/oauth-authorization-server, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/oauth-protected-resource, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/api-catalog, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/ai-plugin.json, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/agent-card.json, status: 404, content_type: text/plain, file: null}
+      - {path: /.well-known/agent.json, status: 404, content_type: text/plain, file: null}
+    note: >-
+      Notable gap: api.stotles.com/mcp is a live MCP endpoint that rejects anonymous calls with a
+      JSON-RPC -32001 "Unauthorized: Missing API key", yet the host publishes NO
+      /.well-known/oauth-protected-resource and NO /.well-known/oauth-authorization-server. The
+      server authenticates with a static `x-api-key` header rather than OAuth, so there is no
+      authorization-server metadata to publish — but that also means an MCP client cannot discover
+      how to authenticate without out-of-band instructions from a Stotles CSM.
+
+  - host: www.stotles.com
+    role: marketing site / llms.txt host
+    paths:
+      - {path: /.well-known/security.txt, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/openid-configuration, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/oauth-authorization-server, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/api-catalog, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/ai-plugin.json, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/agent-card.json, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+      - {path: /.well-known/agent.json, status: 404, content_type: 'text/html; charset=utf-8', file: null}
+    note: >-
+      All eight responses are the identical 88-byte Webflow catch-all body
+      "<p>Invalid .well-known request</p>". Not documents.
+
+  - host: app.stotles.com
+    role: web application / customer console
+    paths:
+      - {path: /.well-known/security.txt, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/openid-configuration, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/oauth-authorization-server, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/api-catalog, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/ai-plugin.json, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/agent-card.json, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+      - {path: /.well-known/agent.json, status: 404, content_type: 'text/html; charset=UTF-8', file: null}
+    note: >-
+      Every path returns the same 1,151-byte SPA index shell. app.stotles.com supports enterprise
+      SSO on the Expert tier per the pricing page, but publishes no OpenID Provider metadata at
+      /.well-known/openid-configuration.
+
+  - host: help.stotles.com
+    role: help centre
+    paths:
+      - {path: /.well-known/security.txt, status: 404, content_type: 'text/html;charset=utf-8', file: null}
+      - {path: /.well-known/agent-card.json, status: 404, content_type: 'text/html;charset=utf-8', file: null}
+      - {path: /.well-known/agent.json, status: 404, content_type: 'text/html;charset=utf-8', file: null}
+    note: Hosted help centre; answers all unknown paths with its 107 KB SPA shell.
+
+root_path_documents:
+  - host: www.stotles.com
+    path: /llms.txt
+    status: 200
+    content_type: 'text/plain; charset=utf-8'
+    bytes: 20096
+    file: ../llms/stotles-llms.txt
+    note: >-
+      The only machine-readable discovery document Stotles publishes. Saved verbatim under llms/.
+  - host: api.stotles.com
+    path: /llms.txt
+    status: 404
+    file: null
+  - host: app.stotles.com
+    path: /llms.txt
+    status: 404
+    file: null

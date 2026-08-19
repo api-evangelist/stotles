@@ -1,0 +1,103 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  The "Rate limits" section Stotles writes into info.description of its own OpenAPI
+  (https://api.stotles.com/v1/openapi.json, HTTP 200, harvested 2026-08-14), plus the RateLimited
+  response component and its declared Retry-After header.
+docs: https://api.stotles.com/v1/openapi.json
+limit_count: 2
+
+summary: >-
+  Two limits apply simultaneously to every API key: 1,000 requests per hour AND 3 requests per
+  second. Stotles states plainly that the second one bites first — "a burst of parallel requests
+  can be throttled well inside your hourly allowance."
+
+limits:
+  - id: hourly-per-key
+    scope: per-api-key
+    window: 1 hour
+    limit: 1000
+    burst: null
+    applies_to: all 8 operations on https://api.stotles.com/v1
+    statement: '"Each API key may make 1,000 requests per hour"'
+  - id: per-second-per-key
+    scope: per-api-key
+    window: 1 second
+    limit: 3
+    burst: null
+    applies_to: all 8 operations on https://api.stotles.com/v1
+    statement: '"and no more than 3 requests per second. Both apply at once"'
+    note: >-
+      3 rps is the binding constraint in practice. Sustained at 3 rps a key would exhaust the hourly
+      1,000 in about 5.5 minutes, so the two limits describe very different regimes: short bursts
+      are capped by the per-second rule, sustained work by the hourly rule.
+
+exhaustion:
+  status_code: 429
+  content_type: application/problem+json
+  problem_type: https://api.stotles.com/problems/rate-limited
+  title: Too many requests
+  detail: Rate limit exceeded. Retry later.
+
+response_headers:
+  on_exhaustion:
+    - name: Retry-After
+      type: integer
+      units: seconds
+      documented: true
+      declared_in_spec: true
+      description: Seconds to wait before retrying.
+      statement: >-
+        "Over either limit you get a 429 carrying a Retry-After header — the number of seconds to
+        wait. Honour it and retry; a client that retries immediately will keep getting 429s."
+  on_success: []
+  gap: >-
+    NO proactive rate-limit headers are published or observed. There is no X-RateLimit-Limit,
+    X-RateLimit-Remaining, X-RateLimit-Reset, and no RFC 9239-style RateLimit / RateLimit-Policy
+    header on successful responses. An unauthenticated probe of
+    https://api.stotles.com/v1/notices/search on 2026-08-14 returned only standard CloudFront and
+    security headers plus `request-id` — no rate-limit family at all.
+  agent_impact: >-
+    A client cannot see how much budget it has left. It can only discover the limit by crossing it.
+    That forces either conservative hard-coded pacing (<=3 rps, <=1,000/hr) or reactive backoff on
+    429. This is the single clearest ergonomics improvement available to Stotles on this API:
+    emitting RateLimit-Remaining/Reset on 2xx would let an agent pace itself instead of colliding.
+  method: probed
+  probed_at: '2026-08-14'
+  probe_note: >-
+    The probe was unauthenticated (401), so headers present only on authenticated 2xx responses
+    could not be ruled out with certainty. Nothing in the provider's own documentation mentions any,
+    which is the stronger signal.
+
+client_guidance:
+  - Cap concurrency so no more than 3 requests are in flight per second per key.
+  - Sleep exactly Retry-After seconds on a 429; do not retry immediately and do not jitter below it.
+  - >-
+    Budget the hourly allowance against the traversal pattern: because every relationship on this
+    API is navigated by re-querying searchNotices with a filter (there are no sub-resources — see
+    data-model/stotles-data-model.yml), a naive buyer-by-buyer market sweep burns the 1,000/hour
+    quickly. Page at limit=50 (the maximum) rather than the default 20 to cut request count by 60%.
+  - >-
+    Rate limits are per key, and a key identifies the whole ORGANIZATION. Multiple internal services
+    sharing one key share one budget and will throttle each other.
+  - '"If these limits don''t fit your use case, talk to your Customer Success Manager." — limits are negotiable, not fixed.'
+
+mcp_surface:
+  endpoint: https://api.stotles.com/mcp
+  limits_published: false
+  note: >-
+    Stotles publishes no separate rate limits for the MCP server. Whether MCP tool calls draw on the
+    same per-key budget as REST could not be determined without a key. An agent should assume they
+    share it.
+
+quota_vs_rate:
+  data_quota_published: false
+  note: >-
+    No record/row cap, monthly credit pool, or data-volume quota is published — only request rate.
+    Pricing tiers (plans/stotles-plans-pricing.yml) do not mention API access at all, so there is no
+    published mapping from plan to API quota.
+
+cross_references:
+  errors: errors/stotles-problem-types.yml
+  conventions: conventions/stotles-conventions.yml
+  plans: plans/stotles-plans-pricing.yml

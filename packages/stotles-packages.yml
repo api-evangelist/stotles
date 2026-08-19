@@ -1,0 +1,134 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  Registry sweeps of npm (registry.npmjs.org search + per-package metadata), PyPI, RubyGems,
+  crates.io, NuGet, Maven Central and pkg.go.dev, plus the github.com/Stotles organization listing
+  via the GitHub API, run 2026-08-14.
+
+summary:
+  first_party_sdk_count: 0
+  first_party_package_count: 2
+  third_party_package_count: 0
+  note: >-
+    Stotles publishes NO client library for the Stotles Public API in any registry, in any language.
+    The two packages below ARE first-party (published under the `@stotles` npm scope from the
+    company's own GitHub organization) but they are internal engineering libraries Stotles has
+    open-sourced — a NestJS/GraphQL utility and a Better Auth plugin — not API clients. They cannot
+    be used to call api.stotles.com.
+  sdk_pointer_policy: >-
+    NO `SDKs` pointer is emitted in apis.yml. The sdk_count check must read a genuine zero here.
+    Emitting SDKs on the strength of two unrelated first-party libraries would credit Stotles with
+    a client-library practice it does not have. `Packages` is emitted, because the packages are real.
+
+official_api_clients: []
+
+first_party_packages:
+  - language: typescript
+    registry: npm
+    name: '@stotles/nestjs-graphql-zod'
+    url: https://www.npmjs.com/package/@stotles/nestjs-graphql-zod
+    install: npm install @stotles/nestjs-graphql-zod
+    official: true
+    api_client: false
+    version: 4.1.3
+    published: '2026-06-23'
+    license: MPL-2.0
+    repository: https://github.com/Stotles/nestjs-graphql-zod
+    description: >-
+      "A library providing dynamic GraphQL object classes from their zod validation objects."
+      A general-purpose NestJS/GraphQL developer utility, not a Stotles API client. A fork/maintained
+      continuation of an upstream community package, republished under the Stotles scope.
+    source: https://registry.npmjs.org/@stotles/nestjs-graphql-zod
+    note: >-
+      Actively maintained — last release 2026-06-23, repo pushed 2026-08-02. Incidentally reveals
+      Stotles' internal stack (NestJS + GraphQL + Zod), which is consistent with the
+      zod-flavoured validation messages in the public API's 400 responses
+      ("Too big: expected number to be <=50").
+
+  - language: typescript
+    registry: npm
+    name: '@stotles/better-auth-audit-logs'
+    url: https://www.npmjs.com/package/@stotles/better-auth-audit-logs
+    install: npm install @stotles/better-auth-audit-logs
+    official: true
+    api_client: false
+    version: 0.5.1
+    published: '2026-07-15'
+    license: MIT
+    repository: https://github.com/Stotles/better-auth-audit-logs
+    description: >-
+      "Audit log plugin for Better Auth. Auto-captures auth events with severity inference, PII
+      redaction, custom storage backends, and retention policies." An authentication-infrastructure
+      plugin Stotles open-sourced; not a Stotles API client.
+    source: https://registry.npmjs.org/@stotles/better-auth-audit-logs
+    note: >-
+      Most recently maintained Stotles open-source artifact — released 2026-07-15, repo pushed
+      2026-08-11.
+
+third_party_packages: []
+
+github_organization:
+  found: true
+  url: https://github.com/Stotles
+  id: 55193790
+  checked: '2026-08-14'
+  public_repos:
+    - {name: nestjs-graphql-zod, language: TypeScript, pushed: '2026-08-02', note: 'published to npm as @stotles/nestjs-graphql-zod'}
+    - {name: better-auth-audit-logs, language: TypeScript, pushed: '2026-08-11', note: 'published to npm as @stotles/better-auth-audit-logs'}
+    - {name: better-auth, language: null, pushed: '2026-08-09', note: 'fork of the Better Auth framework'}
+    - {name: assignment-backend, language: TypeScript, pushed: '2026-02-13', note: 'hiring take-home exercise'}
+    - {name: assignment-full-stack, language: TypeScript, pushed: '2025-03-19', note: 'hiring take-home exercise'}
+  note: >-
+    Five public repos. None is an API client, an OpenAPI mirror, an MCP server, or example code for
+    the Stotles Public API. The organization is used for open-sourcing internal libraries and for
+    engineering-hiring exercises.
+
+negative_probes:
+  - registry: npm
+    query: 'text=stotles'
+    result: 'Only the two @stotles/* packages above. No stotles-api, stotles-sdk, stotles-client, or @stotles/mcp.'
+  - registry: pypi
+    names: [stotles]
+    result: '404'
+  - registry: pypi
+    names: [stotles-api, stotles-sdk, stotles-client]
+    result: 'not published (no PyPI project exists under any stotles name)'
+  - registry: rubygems
+    names: [stotles]
+    result: not published
+  - registry: crates.io
+    names: [stotles]
+    result: not published
+  - registry: nuget
+    names: [Stotles]
+    result: not published
+  - registry: maven-central
+    names: [com.stotles]
+    result: not published
+  - registry: pkg.go.dev
+    names: [github.com/Stotles]
+    result: 'no Go module published'
+
+cdn_distributions: []
+
+integration_alternatives:
+  note: >-
+    In place of an SDK, Stotles' documented integration paths are: raw HTTPS calls to
+    https://api.stotles.com/v1 with an `x-api-key` header; the hosted MCP server at
+    https://api.stotles.com/mcp (beta, waitlist); and native product connectors for Salesforce,
+    HubSpot, Slack, Microsoft Teams, SharePoint and Google Drive configured inside the app rather
+    than by a developer.
+  postman_collection:
+    published: false
+    note: No public Postman workspace or collection was found for Stotles.
+  openapi_generation_viable: true
+  openapi_generation_note: >-
+    The published OpenAPI 3.1.0 is complete enough (typed parameters, enums with descriptions,
+    response schemas, RFC 9457 error components) that a consumer can generate a perfectly usable
+    client with openapi-generator or Hey API. The absence of an official SDK is therefore a low-cost
+    gap for consumers — but it is still a real zero.
+
+cross_references:
+  openapi: openapi/stotles-public-api-openapi.yml
+  mcp: mcp/stotles-mcp.yml
+  authentication: authentication/stotles-authentication.yml

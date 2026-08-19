@@ -1,0 +1,109 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  openapi/stotles-public-api-openapi.yml components.securitySchemes (harvested verbatim from
+  https://api.stotles.com/v1/openapi.json), the Authentication section of the spec's own
+  info.description, and a live unauthenticated probe of
+  https://api.stotles.com/v1/notices/search (HTTP 401, application/problem+json).
+docs: https://api.stotles.com/v1/openapi.json
+summary: >-
+  One scheme, one header, no OAuth, no scopes, no token exchange. Every request to the Stotles
+  Public API and to the Stotles MCP server carries a long-lived static API key in `x-api-key`.
+  Keys are issued out of band by a Stotles Customer Success Manager; there is no self-serve
+  key issuance and no developer console.
+
+schemes:
+  - id: apiKey
+    type: apiKey
+    in: header
+    name: x-api-key
+    required: true
+    applies_to:
+      - https://api.stotles.com/v1 (all 8 operations — global `security` requirement in the spec)
+      - https://api.stotles.com/mcp (MCP server; same header per the endpoint's own self-description)
+    description: >-
+      "Every request needs an API key, sent in the `x-api-key` header. Keys are issued by Stotles —
+      ask your Customer Success Manager. A key identifies your organization, so treat it as a
+      secret: keep it server-side and out of source control. Requests without a valid key get a
+      401." — Stotles Public API, info.description.
+    example_request: |
+      curl -G https://api.stotles.com/v1/notices/search \
+        -H "x-api-key: $STOTLES_API_KEY" \
+        --data-urlencode "query=cyber security"
+
+oauth2:
+  supported: false
+  evidence:
+    - 'openapi components.securitySchemes declares only `apiKey`; no oauth2 or openIdConnect scheme.'
+    - 'https://api.stotles.com/.well-known/oauth-authorization-server -> 404'
+    - 'https://api.stotles.com/.well-known/oauth-protected-resource -> 404'
+    - 'https://app.stotles.com/.well-known/openid-configuration -> 404'
+  note: >-
+    No OAuth means no scopes artifact for this provider — scopes/ is genuinely N/A, not missing.
+    Enterprise SSO is offered on the Expert tier for human login to app.stotles.com per the pricing
+    page, but no OpenID Provider metadata is published and SSO does not extend to the API.
+
+mutual_tls:
+  supported: false
+webhooks_signing:
+  supported: false
+  note: No webhook or event surface is published; nothing to sign. See lifecycle/ and apis.yml.
+
+key_properties:
+  identity_granularity: organization
+  note: '"A key identifies your organization" — one key represents a tenant, not an end user.'
+  rotation_policy:
+    published: false
+    note: >-
+      No documented rotation cadence, expiry, revocation endpoint, or multi-key support. There is no
+      published way for a customer to rotate a leaked key themselves; the documented channel for
+      anything key-related is the Customer Success Manager.
+  prefix:
+    published: false
+    note: >-
+      Stotles does not publish a key prefix (contrast Stripe `sk_live_`). Because there is no
+      documented prefix and no test-mode key, a leaked Stotles key is not recognizable by shape to
+      secret-scanning tooling — neither GitHub push protection nor this pipeline's sanitizer can
+      match it.
+  test_mode:
+    exists: false
+    note: >-
+      No sandbox, test key, or test mode is published. The only key is a live key against production
+      data. See the absent sandbox/ artifact — this is a real DX gap, not an omission by us.
+
+failure_semantics:
+  missing_or_invalid_key:
+    http_status: 401
+    content_type: application/problem+json
+    body_observed: >-
+      {"type":"https://api.stotles.com/problems/unauthenticated","title":"Unauthenticated",
+      "status":401,"detail":"Missing or invalid API key."}
+    probed: '2026-08-14 against https://api.stotles.com/v1/notices/search?query=cyber (no key sent)'
+  mcp_missing_key:
+    http_status: 401
+    transport: json-rpc
+    body_observed: >-
+      {"jsonrpc":"2.0","error":{"code":-32001,"message":"Unauthorized: Missing API key"},"id":null}
+    probed: '2026-08-14 against POST https://api.stotles.com/mcp (tools/list, no key sent)'
+    note: >-
+      The MCP surface reports auth failure as a JSON-RPC error object with code -32001, NOT as an
+      RFC 9457 problem document. An agent handling both surfaces needs two error paths.
+
+agent_notes:
+  - >-
+    Static header key, no refresh, no expiry: an agent needs exactly one secret and never has to
+    implement a token lifecycle. That is the ergonomic upside of this design.
+  - >-
+    The downside is procurement: there is no self-serve signup for a key. An agent builder cannot
+    obtain credentials without a commercial conversation with Stotles. See
+    plans/stotles-plans-pricing.yml — API access is not attached to any published tier.
+  - >-
+    Send the key server-side only. It carries the whole organization's entitlement and there is no
+    documented scoping, rate-limit partitioning per user, or revocation self-service.
+
+cross_references:
+  conventions: conventions/stotles-conventions.yml
+  errors: errors/stotles-problem-types.yml
+  rate_limits: rate-limits/stotles-rate-limits.yml
+  mcp: mcp/stotles-mcp.yml
+  well_known: well-known/stotles-well-known.yml

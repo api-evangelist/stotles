@@ -1,0 +1,153 @@
+generated: '2026-08-14'
+method: searched
+format: rfc9457
+source: >-
+  Derived from components.responses and components.schemas.ProblemDetails in
+  openapi/stotles-public-api-openapi.yml, enriched from the "Errors" section Stotles writes into
+  its own info.description, and confirmed against live unauthenticated responses from
+  api.stotles.com on 2026-08-14.
+content_type: application/problem+json
+spec: https://www.rfc-editor.org/rfc/rfc9457
+type_namespace: https://api.stotles.com/problems/
+
+summary: >-
+  A genuine RFC 9457 implementation: every non-2xx response on all 8 operations returns
+  application/problem+json against a single ProblemDetails schema, with a stable `type` URI per
+  category and a structured `errors[]` locator on validation failures. Stotles states the branching
+  contract explicitly — clients branch on `type`, never on `title` or `detail`.
+
+envelope:
+  schema: ProblemDetails
+  required: [type, title, status]
+  optional: [detail, errors]
+  additional_properties: true
+  fields:
+    type:
+      format: uri
+      description: Stable category identifier — clients branch on this.
+    title:
+      description: Short, human-readable summary of the category. Stable per `type`.
+    status:
+      description: HTTP status code, duplicated in the body so the payload is self-contained.
+    detail:
+      description: >-
+        Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
+    errors:
+      description: Per-field validation failures; present only on validation (400) problems.
+      item_variants:
+        - {keys: [detail, parameter], meaning: a query or path parameter failed validation}
+        - {keys: [detail, pointer], meaning: a request body field failed validation}
+        - {keys: [detail, header], meaning: a header failed validation}
+      note: >-
+        The `pointer` variant is defined in the schema but cannot occur on today's surface — all 8
+        operations are GET with no request body. It is forward-looking.
+
+type_uri_resolution:
+  dereferenceable: false
+  probed: '2026-08-14'
+  evidence: 'GET https://api.stotles.com/problems/validation -> 404 text/plain'
+  note: >-
+    The `type` URIs are stable identifiers but are NOT dereferenceable documents — nothing is served
+    at https://api.stotles.com/problems/*. RFC 9457 permits this ("when dereferenced, it is
+    encouraged... to provide documentation"), but it means the URI carries no human-readable
+    explanation. This catalog is the substitute. Worth asking Stotles to publish those pages.
+
+problem_types:
+  - type: https://api.stotles.com/problems/validation
+    title: Request validation failed
+    status: 400
+    component: ValidationError
+    detail_example: "The request parameters failed validation. See the 'errors' array for details."
+    carries_errors_array: true
+    applies_to: all 8 operations
+    common_causes:
+      - 'Malformed UUID in a path or id filter — errors[]: {"parameter":"id","detail":"Invalid uuid"}'
+      - 'limit out of bounds — errors[]: {"parameter":"limit","detail":"Too big: expected number to be <=50"}'
+      - Comma-joining a multi-value filter instead of repeating the parameter.
+      - Passing a timestamp where a YYYY-MM-DD calendar date is required.
+      - Omitting the required `query` on /v1/buyers/search or /v1/suppliers/search.
+      - Sending a `query` shorter than 2 characters.
+    remediation: >-
+      Read errors[].parameter to locate the offending input and fix it before retrying. This is a
+      permanent failure — retrying the identical request will fail identically. Do not back off
+      and retry; correct the request.
+
+  - type: https://api.stotles.com/problems/unauthenticated
+    title: Unauthenticated
+    status: 401
+    component: Unauthenticated
+    detail_example: Missing or invalid API key.
+    carries_errors_array: false
+    applies_to: all 8 operations
+    verified_live: >-
+      Observed verbatim on GET https://api.stotles.com/v1/notices/search?query=cyber with no key,
+      2026-08-14.
+    common_causes:
+      - No `x-api-key` header sent.
+      - Key revoked, mistyped, or belonging to a different environment.
+    remediation: >-
+      Supply a valid `x-api-key`. Keys are issued by a Stotles Customer Success Manager; there is no
+      self-serve reissue. Not retryable without operator action.
+
+  - type: https://api.stotles.com/problems/not-found
+    title: Not found
+    status: 404
+    component: NotFound
+    detail_example: No notice exists with the given id.
+    carries_errors_array: false
+    applies_to: [getNotice, getBuyer, getSupplier, getFramework]
+    note: >-
+      Only the four by-id operations declare 404. The four /search operations never 404 — an
+      empty result set is a 200 with `items: []`. An agent must not treat "no results" as an error.
+    remediation: >-
+      The id is well-formed but resolves to nothing (or nothing your organization can see). Confirm
+      the id came from a Stotles search response. Not retryable.
+
+  - type: https://api.stotles.com/problems/rate-limited
+    title: Too many requests
+    status: 429
+    component: RateLimited
+    detail_example: Rate limit exceeded. Retry later.
+    carries_errors_array: false
+    applies_to: all 8 operations
+    response_headers:
+      - name: Retry-After
+        type: integer
+        description: Seconds to wait before retrying.
+    remediation: >-
+      "Honour it and retry; a client that retries immediately will keep getting 429s." Sleep for
+      exactly Retry-After seconds, then retry. This is the ONLY runtime rate-limit signal the API
+      emits — there are no X-RateLimit-* headers on success. See rate-limits/stotles-rate-limits.yml.
+    retryable: true
+
+  - type: https://api.stotles.com/problems/internal
+    title: Internal server error
+    status: 500
+    component: InternalError
+    detail_example: null
+    carries_errors_array: false
+    applies_to: all 8 operations
+    note: >-
+      `detail` is deliberately OMITTED on 5xx — "Omitted on 5xx so we never leak internals." Do not
+      write error-handling that requires `detail` to be present.
+    remediation: >-
+      Retry with exponential backoff, staying inside the 3 req/sec ceiling. Quote the `request-id`
+      response header to Stotles support if it persists.
+    retryable: true
+
+agent_handling_matrix:
+  - {status: 400, retry: never, action: 'fix the request using errors[].parameter'}
+  - {status: 401, retry: never, action: 'escalate — credentials problem, needs a human'}
+  - {status: 404, retry: never, action: 'treat as absent, not as failure'}
+  - {status: 429, retry: true, action: 'sleep Retry-After seconds exactly, then retry'}
+  - {status: 500, retry: true, action: 'exponential backoff, cap attempts, log request-id'}
+
+mcp_surface_divergence:
+  note: >-
+    The MCP endpoint at https://api.stotles.com/mcp does NOT use this envelope. It reports failures
+    as JSON-RPC error objects — observed:
+    {"jsonrpc":"2.0","error":{"code":-32001,"message":"Unauthorized: Missing API key"},"id":null}
+    at HTTP 401. An integration spanning both surfaces needs two distinct error paths. Whether the
+    MCP server maps 400/404/429/500 onto JSON-RPC codes could not be determined without a key.
+  method: probed
+  probed_at: '2026-08-14'

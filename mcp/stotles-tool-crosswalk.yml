@@ -1,0 +1,119 @@
+generated: '2026-08-14'
+method: derived
+source: >-
+  Binds the Stotles MCP server (probed live at https://api.stotles.com/mcp, tools/list gated behind
+  x-api-key) to the operations in openapi/stotles-public-api-openapi.yml (harvested verbatim from
+  https://api.stotles.com/v1/openapi.json, HTTP 200, 2026-08-14).
+
+surfaces:
+  openapi:
+    file: openapi/stotles-public-api-openapi.yml
+    original: openapi/_original/stotles-public-api-openapi.json
+    served_at: https://api.stotles.com/v1/openapi.json
+    http_status: 200
+    gated: false
+    note: >-
+      The spec document itself is served anonymously; the operations it describes are not.
+      Every call needs `x-api-key`, so an unauthenticated agent gets 401 problem+json.
+  mcp:
+    url: https://api.stotles.com/mcp
+    transport: streamable-http
+    gated: true
+    note: >-
+      POST tools/list returns JSON-RPC error -32001 "Unauthorized: Missing API key" (HTTP 401).
+      The real tool names and inputSchemas are NOT observable anonymously.
+  graphql:
+    present: false
+    note: api.stotles.com/graphql returns 404. No public GraphQL surface.
+
+confidence_basis: >-
+  Because the live tool list is gated and Stotles publishes no MCP tool reference, every row below
+  is mapped by SEMANTICS, not by an observed tool name. Confidence is capped at `medium` for the
+  whole crosswalk: the REST operations are certain, the tool names are inferred. The `inputSchema`
+  column is real regardless — whatever the tools are named, an MCP tool fronting `searchNotices`
+  inherits that operation's 23 query parameters.
+
+crosswalk:
+  - tool: search_notices
+    category: notices
+    rest: [searchNotices]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/notices/search'
+    parameters: [query, query_operator, country_code, cpv_code, buyer_id, supplier_id, stage,
+      framework_id, framework_activity, publish_date_gte, publish_date_lte, close_date_gte,
+      close_date_lte, expiry_date_gte, expiry_date_lte, award_date_gte, award_date_lte, value_gte,
+      value_lte, sort, order, limit, cursor]
+    note: >-
+      The richest operation on the surface and the one that most plausibly backs the product claim
+      that the MCP "lets them search Stotles market data directly". Multi-value filters repeat the
+      parameter rather than comma-joining, which an agent generating query strings must get right.
+  - tool: get_notice
+    category: notices
+    rest: [getNotice]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/notices/{id}'
+    parameters: [id]
+  - tool: search_buyers
+    category: buyers
+    rest: [searchBuyers]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/buyers/search'
+    parameters: [query, country_code, type, type_group, limit, cursor]
+    note: '`query` is REQUIRED here (min 2, max 200 chars) — unlike notices search, there is no browse-all mode.'
+  - tool: get_buyer
+    category: buyers
+    rest: [getBuyer]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/buyers/{id}'
+    parameters: [id]
+  - tool: search_suppliers
+    category: suppliers
+    rest: [searchSuppliers]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/suppliers/search'
+    parameters: [query, country_code, limit, cursor]
+    note: '`query` is REQUIRED.'
+  - tool: get_supplier
+    category: suppliers
+    rest: [getSupplier]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/suppliers/{id}'
+    parameters: [id]
+  - tool: search_frameworks
+    category: frameworks
+    rest: [searchFrameworks]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/frameworks/search'
+    parameters: [query, stage, start_date_gte, start_date_lte, end_date_gte, end_date_lte, sort,
+      order, limit, cursor]
+  - tool: get_framework
+    category: frameworks
+    rest: [getFramework]
+    binding: one-to-one
+    confidence: medium
+    inherits_input_schema_from: 'GET /v1/frameworks/{id}'
+    parameters: [id]
+
+mcp_only: []
+
+rest_only: []
+
+coverage:
+  rest_operations: 8
+  candidate_tools: 8
+  mapped: 8
+  mcp_only: 0
+  rest_only: 0
+  observed_tools: null
+  note: >-
+    A clean 1:1 shape is the most likely outcome for a surface this small and this uniformly
+    read-only, but it is a PREDICTION until an authenticated tools/list confirms it. The real server
+    may collapse the four `get_*` tools into one, or add composite tools (e.g. a buyer's notice
+    history) that have no single backing operation. Re-run this crosswalk with a key to settle it.

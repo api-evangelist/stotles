@@ -1,24 +1,176 @@
-# Stotles
+﻿# llms.txt for https://www.stotles.com/
+> Stotles is a platform that helps suppliers discover, track, and win public sector opportunities in the UK. It provides tools for building a strategy, creating a pipeline, monitoring tenders, and maximizing bid success — all in one platform.
+# Purpose: Guide AI language models to understand public content while blocking private areas
 
-> Stotles is a B2G (business-to-government) public sector procurement and sales intelligence platform for the UK and Ireland. It aggregates procurement notices, awards, framework agreements, buyer spend, and decision-maker contacts from sources such as Find a Tender, Contracts Finder, Digital Marketplace, TED, and Public Contracts Scotland, then layers tender discovery, market intelligence, AI-assisted bid qualification, and pipeline management on top so suppliers can find and win government contracts.
 
-Stotles is delivered as a SaaS web application (app.stotles.com). No public developer API or OpenAPI specification is published as of this writing; the platform integrates with CRMs (Salesforce, HubSpot) and collaboration tools (Microsoft Teams, SharePoint, Slack, Google Drive) rather than exposing a public API surface.
+# Last updated: 2025-10-27
 
-## Product
-- [Platform overview](https://www.stotles.com/platform): Tender discovery, market intelligence, Sales Studio, Bid Studio, and pipeline management.
-- [Data coverage](https://www.stotles.com/data): 8M+ procurement notices and awards from 15K+ public buying organizations.
-- [Pricing](https://www.stotles.com/pricing): Free, Basic, Growth, and Expert tiers across Sales Studio, Bid Studio, and the combined B2G Growth Engine.
+User-agent: *
+Allow: /
+# Popular AI / LLM bots — explicitly allowed
+User-agent: GPTBot
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Bard
+Allow: /
+User-agent: Gemini
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: FacebookBot
+Allow: /
+User-agent: DuckAssistBot
+Allow: /
+User-agent: YouBot
+Allow: /
+User-agent: Amazonbot
+Allow: /
 
-## Get started
-- [Sign up / Get started](https://app.stotles.com/get-started)
-- [Login](https://app.stotles.com/users/sign_in)
-- [Help center](https://help.stotles.com/)
 
-## Docs & resources
-- [Resource hub / Blog](https://www.stotles.com/resources)
-- [Public sector framework database](https://www.stotles.com/ppc/public-sector-framework-database)
 
-## Trust & legal
-- [Trust center (Vanta)](https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm): SOC 2 Type II, GDPR.
-- [Privacy policy](https://www.stotles.com/privacy-policy)
-- [Terms and conditions](https://www.stotles.com/terms-and-conditions)
+
+# Public pages with descriptions
+– Home — https://www.stotles.com — Overview of Stotles platform and key features for public sector suppliers.
+
+
+
+
+## Platform
+
+
+ – Platform Overview — https://www.stotles.com/platform — Introduction to tools for strategy, pipeline building, tender tracking, and winning bids.
+– Create Strategy — https://www.stotles.com/platform/create-strategy — Guidance on creating an effective public sector strategy.
+– Build Pipeline — https://www.stotles.com/platform/build-pipeline — Tools for building a pipeline of public sector opportunities.
+– Track Tenders — https://www.stotles.com/platform/track-tenders — Monitor relevant tenders to maximize opportunities.
+– Win Bids — https://www.stotles.com/platform/win-bids — Resources to improve bid success and win contracts.
+
+
+
+
+
+## Informative
+
+
+ – Pricing — https://www.stotles.com/pricing — Subscription plans and pricing information for suppliers.
+– About Us — https://www.stotles.com/company/about-us — Company background, mission, and team information.
+– Resources — https://www.stotles.com/resources — Collection of reports, blogs, and guides for public sector suppliers.
+– Customers — https://www.stotles.com/customers — Case studies and success stories of suppliers using Stotles.
+##Reports
+– 2024 Autumn Budget Spotlight Report — https://www.stotles.com/resource/report/2024-autumn-budget-spotlight-report-05112024 — Key insights from the Autumn Budget for public sector suppliers.
+– Autumn Budget Spotlight: Capitalise on £11.2B Education Funding — https://www.stotles.com/resource/report/autumn-budget-spotlight-capitalise-on-ps11-2b-education-funding — Guidance on education sector opportunities.
+– Central Government Authorities Update Digital Procurement Plans — https://www.stotles.com/resource/report/central-government-authorities-update-digital-procurement-plans — Overview of upcoming procurement plans.
+– Cloud and Cybersecurity in the NHS: A Review of Preferred Suppliers — https://www.stotles.com/resource/report/cloud-and-cybersecurity-in-the-nhs-a-review-of-the-healthcare-systems-preferred-suppliers — Insights into NHS cloud and cybersecurity trends.
+– 2024 Insights to Jumpstart Your 2025 Public Sector Strategy — https://www.stotles.com/resource/report/2024-insights-to-jumpstart-your-2025-public-sector-strategy — Strategies for suppliers to prepare for 2025.
+– Integrated Care Systems Reveal 2024-25 Budget Plans — https://www.stotles.com/resource/report/integrated-care-systems-reveal-2024-25-budget-plans — NHS ICS funding and investment opportunities.
+– Discover £19B of Back Office Software Opportunities — https://www.stotles.com/resource/report/discover-19b-of-back-office-software-opportunities — Analysis of software opportunities in public sector.
+– NHS England Rankings Reveal Buyer Health — https://www.stotles.com/resource/report/nhs-england-rankings-reveal-buyer-health — Ranking of NHS procurement activity.
+– The Green Edge: Capitalise on Labour’s Sustainability Drive — https://www.stotles.com/resource/report/the-green-edge-capitalise-on-labours-sustainability-drive — Sustainability-focused procurement opportunities.
+– Unlocking Opportunities for Telecommunications Suppliers in 2025 Autumn Budget — https://www.stotles.com/resource/report/unlocking-opportunities-for-telecommunications-suppliers-in-2025-autumn-budget-insights-27112024 — Telecom supplier guidance.
+– Prepare for G-Cloud 14 — https://www.stotles.com/resource/report/prepare-for-g-cloud-14 — How suppliers can leverage G-Cloud 14 opportunities.
+– Local Government Supplier Handbook — https://www.stotles.com/resource/report/local-government-supplier-handbook — Comprehensive guide for suppliers targeting local authorities.
+– Ministry of Defence Reveal Commercial Pipeline — https://www.stotles.com/resource/report/the-ministry-of-defence-reveal-commercial-pipeline — MoD procurement insights and upcoming tenders.
+– The UK Procurement Act 2023: Your 2025 Go Live Playbook — https://www.stotles.com/resource/report/the-uk-procurement-act-2023-your-2025-go-live-playbook — Guidance on navigating new procurement regulations.
+– £1.3 Billion Lifeline for 30 UK Councils in 2025 — https://www.stotles.com/resource/report/1-3-billion-lifeline-for-30-uk-councils-in-2025-a-guide-for-suppliers-to-capitalise — Local council funding opportunities.
+– Digital Outcomes: 6 Insights for a Winning Strategy — https://www.stotles.com/resource/report/digital-outcomes-6-insights-for-a-winning-strategy — Best practices for digital outcomes contracts.
+– AI and Emerging Technology in UK Healthcare — https://www.stotles.com/resource/report/ai-and-emerging-technology-in-uk-healthcare — Adoption of AI and new tech in healthcare procurement.
+– Ministry of Defence Historic Budget Report — https://www.stotles.com/resource/report/a-report-on-the-ministry-of-defences-historic-budget — Historical spending review for MoD.
+– Suppliers Guide to £80B in Confirmed Upcoming Procurement Spend — https://www.stotles.com/resource/report/suppliers-guide-to-80b-in-confirmed-upcoming-procurement-spend — Overview of major public sector spending.
+– Stotles 101: How to Build Pipeline — https://www.stotles.com/resource/report/stotles-101-how-to-build-pipeline — Beginner’s guide for building a procurement pipeline.
+– Track Relevant Public Sector Tenders 101 — https://www.stotles.com/resource/report/track-relevant-public-sector-tenders-101 — Guide to monitoring tenders effectively.
+– 2025 State of Public Sector Procurement — https://www.stotles.com/resource/report/2025-state-of-public-sector-procurement — Analysis of trends and challenges for suppliers.
+– Win in the Growing £4.7B Digital Government Market — https://www.stotles.com/resource/report/win-in-the-growing-47b-digital-government-market — Strategies for winning digital government contracts.
+– £725B Opportunity: Suppliers Guide to the 10-Year Infrastructure Plan — https://www.stotles.com/resource/report/725b-opportunity-suppliers-guide-to-the-10-year-infrastructure-plan — Infrastructure sector procurement opportunities.
+– How Suppliers Can Win Work in the Home Office 2030 Digital Agenda — https://www.stotles.com/resource/report/how-suppliers-can-win-work-in-the-home-offices-2030-digital-agenda — Home Office contracts insights.
+– Fit for the Future of Healthcare — https://www.stotles.com/resource/report/fit-for-the-future-of-healthcare-an-outcome-focused-analysis-for-suppliers — Healthcare supplier opportunities.
+– £6.3 Billion in NHS Capital Budgets: Where ICBs Are Investing in 2025-26 — https://www.stotles.com/resource/report/6-3-billion-in-nhs-capital-budgets-where-icbs-are-investing-in-2025-26 — Capital investment insights.
+– Stotles Annual Review 2025 — https://www.stotles.com/resource/report/stotles-annual-review-2025-trends-challenges-opportunities-selling-to-the-uk-public-sector — Trends and opportunities in UK public sector procurement.
+– The Stotles Supplier Guide to DigiGov — https://www.stotles.com/resource/report/the-stotles-supplier-guide-to-digigov — Supplier guidance for DigiGov program.
+– How to Grow Your Revenue at DigiGov — https://www.stotles.com/resource/report/how-to-grow-your-revenue-at-digigov — Tips for increasing revenue through DigiGov.
+– How to Grow Your Revenue at HETT — https://www.stotles.com/resource/report/how-to-grow-your-revenue-at-hett — Revenue growth strategies for HETT program.
+
+
+##Blogs
+– 2024 Autumn Budget: Why Public Sector Suppliers Should Care — https://www.stotles.com/resource/blog/2024-autumn-budget-why-public-sector-suppliers-should-care — Explains the impact of the Autumn Budget on supplier opportunities.
+– 5 Routes to Win Public Sector Deals Through Affiliate Marketing — https://www.stotles.com/resource/blog/5-routes-to-win-public-sector-deals-through-affiliate-marketing — Strategies to leverage affiliate marketing in public sector procurement.
+– A How-To Guide to Public Sector Procurement: A Short Overview of the Stotles Process — https://www.stotles.com/resource/blog/a-how-to-guide-to-public-sector-procurement-a-short-overview-of-the-stotles-process — Step-by-step guide for suppliers navigating the procurement process.
+– Achieving Success in Public Sector Procurement: Insights from AI Company Modular Data — https://www.stotles.com/resource/blog/achieving-success-in-public-sector-procurement-insights-from-ai-company-modular-data — Case study and AI insights for winning contracts.
+– AI Action Plan: Signals Opportunities in the UK Public Sector — https://www.stotles.com/resource/blog/ai-action-plan-signals-opportunities-in-the-uk-public-sector-supplier-insights-for-2025 — Analysis of emerging AI opportunities for suppliers.
+– Analyse G-Cloud Historical Spending Trends to Boost Your Bids Success — https://www.stotles.com/resource/blog/analyse-g-cloud-historical-spending-trends-to-boost-your-bids-success — Using past G-Cloud data to improve bid outcomes.
+– Announcing Our Latest Public Sector Advisor — https://www.stotles.com/resource/blog/announcing-our-latest-public-sector-advisor — Introduction to Stotles’ new advisory services.
+– Catalysts for Change: The Emerging Technologies Accelerating Digital Transformation in the Public Sector — https://www.stotles.com/resource/blog/catalysts-for-change-the-emerging-technologies-accelerating-digital-transformation-in-the-public-sector — Emerging tech trends impacting public sector digital transformation.
+– GB Energy: Unravelling Labour’s £8.3B Clean Energy Project — https://www.stotles.com/resource/blog/gb-energy-unravelling-labours-ps8-3b-clean-energy-project — Analysis of government clean energy initiatives and supplier opportunities.
+– General Election: Long Term Impact — https://www.stotles.com/resource/blog/general-election-long-term-impact — How UK elections affect public sector procurement trends.
+– Government Cyber Security Strategy — https://www.stotles.com/resource/blog/government-cyber-security-strategy — Insights into cybersecurity priorities for public sector suppliers.
+– Government Procurement Service Frameworks — https://www.stotles.com/resource/blog/government-procurement-service-frameworks — Overview of procurement frameworks for government contracts.
+– Guide to UK General Election — https://www.stotles.com/resource/blog/guide-to-uk-general-election — Implications of general elections on supplier planning.
+– How Are Integrated Care Systems Split Across the UK — https://www.stotles.com/resource/blog/how-are-integrated-care-systems-split-across-the-uk — NHS ICS structure and procurement impact.
+– How NHS Funding Can Be Leveraged to Build Public Sector Pipeline — https://www.stotles.com/resource/blog/how-nhs-funding-can-be-leveraged-to-build-public-sector-pipeline — Using NHS budgets to identify supplier opportunities.
+– How Stotles is Evolving to Support Suppliers in the Transition to the UK Procurement Act 2023 — https://www.stotles.com/resource/blog/how-stotles-is-evolving-to-support-suppliers-in-the-transition-to-the-uk-procurement-act-2023 — Platform updates supporting new procurement regulations.
+– How to Find Public Sector Tenders — https://www.stotles.com/resource/blog/how-to-find-public-sector-tenders — Tips for sourcing relevant tenders efficiently.
+– How to Win Cyber Security Contracts — https://www.stotles.com/resource/blog/how-to-win-cyber-security-contracts — Guidance for suppliers targeting cybersecurity opportunities.
+– How Your Competitors Are Preparing to Use G-Cloud 14 — https://www.stotles.com/resource/blog/how-your-competitors-are-preparing-to-use-g-cloud-14 — Competitive analysis for upcoming G-Cloud releases.
+– Impact of UK Pre-Election Period — https://www.stotles.com/resource/blog/impact-of-uk-pre-election-period — Procurement planning during election uncertainty.
+– InnovateUK Government Grant — https://www.stotles.com/resource/blog/innovateuk-government-grant — Guide to InnovateUK grants for tech suppliers.
+– Launching Our New Website — https://www.stotles.com/resource/blog/launching-our-new-website — Overview of Stotles’ new platform features.
+– Maximise Early Government Tender Wins Before the UK Procurement Act 2023 Launches — https://www.stotles.com/resource/blog/maximise-early-government-tender-wins-before-the-uk-procurement-act-2023-launches — Tips for winning early tenders.
+– Maximise NHS Supplier Opportunities in a Challenging Procurement Landscape — https://www.stotles.com/resource/blog/maximise-nhs-supplier-opportunities-in-a-challenging-procurement-landscape — Strategies to navigate NHS procurement cuts.
+– Navigate the G-Cloud Procurement Calendar — https://www.stotles.com/resource/blog/navigate-the-g-cloud-procurement-calendar — Calendar-based approach to G-Cloud tenders.
+– Navigating NHS Budget Cuts: How to Find Opportunities with Reduced Funding — https://www.stotles.com/resource/blog/navigating-nhs-budget-cuts-how-to-find-opportunities-with-reduced-funding — Finding procurement opportunities in tighter budgets.
+– Partnership AdviceCloud — https://www.stotles.com/resource/blog/partnership-advicecloud — Announcement of new strategic partnership.
+– Partnership Announcement: Stotles and AutogenAI — https://www.stotles.com/resource/blog/partnership-announcement-stotles-and-autogenai — Partnership details for AI integration.
+– Partnership Mozer — https://www.stotles.com/resource/blog/partnership-mozer — Collaboration announcement with Mozer.
+– Partnership NewBusiness Dev — https://www.stotles.com/resource/blog/partnership-newbusiness-dev — Details of partnership supporting new business growth.
+– Procurement Act Guidance: What’s the Impact on New Tender Volume — https://www.stotles.com/resource/blog/procurement-act-guidance-whats-the-impact-on-new-tender-volume — How the act affects tender frequency.
+– Procurement Act Start Date Pushed Back into 2025 — https://www.stotles.com/resource/blog/procurement-act-start-date-pushed-back-into-2025 — Update on implementation timeline.
+– Procurement Landscape Post-UK General Election — https://www.stotles.com/resource/blog/procurement-landscape-post-uk-general-election — Changes in procurement after elections.
+– Product Update: Discover, Build, and Track Pub Sec Relationships — https://www.stotles.com/resource/blog/product-update-discover-build-and-track-pub-sec-relationships — Latest platform feature update.
+– Programmes for Cyber Security Suppliers — https://www.stotles.com/resource/blog/programmes-for-cyber-security-suppliers — Funding and program opportunities for cybersecurity.
+– Public Sector Cyber Security Funding — https://www.stotles.com/resource/blog/public-sector-cyber-security-funding — Overview of available funding schemes.
+– Seed Round Funding — https://www.stotles.com/resource/blog/seed-round-funding — Stotles’ seed round and investment highlights.
+– Stotles GovNet Partnership Launch — https://www.stotles.com/resource/blog/stotles-govnet-partnership-launch — Launch of GovNet collaboration.
+– Stotles Raises £13 Million Series A — https://www.stotles.com/resource/blog/stotles-raises-13-million-series-a — Series A funding announcement.
+– Successful Government Suppliers — https://www.stotles.com/resource/blog/successful-government-suppliers — Stories of supplier success in the public sector.
+– The Impact of the Procurement Act on NHS Suppliers 2024 — https://www.stotles.com/resource/blog/the-impact-of-the-procurement-act-on-nhs-suppliers-2024 — Analysis of NHS supplier changes under new act.
+– The Procurement Bill: Key Impacts for Technology Suppliers — https://www.stotles.com/resource/blog/the-procurement-bill-key-impacts-for-technology-suppliers — Technology supplier guidance.
+– This October: The Social Value Requirements for UK Public Sector Tenders Is Changing — https://www.stotles.com/resource/blog/this-october-the-social-value-requirements-for-uk-public-sector-tenders-is-changing-what-suppliers-need-to-know — Changes to social value requirements.
+– Three Strategies to Win Government Tenders — https://www.stotles.com/resource/blog/three-strategies-to-win-government-tenders — Actionable strategies to win government bids.
+– Top Procurement Trends from 2024 for Cyber, Telecoms, and HealthTech — https://www.stotles.com/resource/blog/top-procurement-trends-from-2024-for-cyber-telecoms-and-healthtech — Trend analysis across sectors.
+– UK Procurement Frameworks 2025: Supplier Insights and Recommendations — https://www.stotles.com/resource/blog/uk-procurement-frameworks-2025-supplier-insights-and-recommendations — Guidance for 2025 framework contracts.
+– Understand the Competitive Flexible Procedures in the UK’s New Procurement Act — https://www.stotles.com/resource/blog/understand-the-competitive-flexible-procedures-in-the-uks-new-procurement-act — Supplier strategies under flexible procedures.
+– Unpacking Routes to Market in Central Government — https://www.stotles.com/resource/blog/unpacking-routes-to-market-in-central-government — How to access central government procurement.
+– Utilise New Notices in the 2023 UK Procurement Act to Secure Government Tenders — https://www.stotles.com/resource/blog/utilise-new-notices-in-the-2023-uk-procurement-act-to-secure-government-tenders — Using new notices for competitive advantage.
+– What Are CPV Codes — https://www.stotles.com/resource/blog/what-are-cpv-codes — Explanation of Common Procurement Vocabulary codes.
+– What is a Tender — https://www.stotles.com/resource/blog/what-is-a-tender — Guide to tender types and processes.
+– What is Bid Rigging? Anti-Competitive Practices — https://www.stotles.com/resource/blog/what-is-bid-rigging-anti-competitive-practices-keeping-the-competition-and-markets-authority-on-alert — Understanding illegal bid practices.
+– What is the NHS Transition to Integrated Care Systems About — https://www.stotles.com/resource/blog/what-is-the-nhs-transition-to-integrated-care-systems-about — Overview of NHS ICS transition and impact on suppliers.
+– What is the Targeted Investment Fund — https://www.stotles.com/resource/blog/what-is-the-targeted-investment-fund — Explanation of government investment fund for suppliers.
+– What is the Unified Tech Fund — https://www.stotles.com/resource/blog/what-is-the-unified-tech-fund — Overview of unified tech funding opportunities for suppliers.
+
+
+
+
+# Sensitive or internal areas to block
+
+
+Disallow: /ppc
+Disallow: /landing-pages
+Disallow: /bid-and-tender-intelligence
+Disallow: /vertical-1
+
+
+
+
+
+
+Sitemap: https://www.stotles.com/sitemap.xml

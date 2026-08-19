@@ -1,16 +1,187 @@
-generated: '2026-07-21'
+generated: '2026-08-14'
 method: searched
-source: https://www.stotles.com/ (compliance posture) + https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm (Vanta trust center)
+source: >-
+  https://api.stotles.com/v1/openapi.json (OpenAPI 3.1.0, harvested verbatim 2026-08-14) +
+  https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm (Vanta trust center) +
+  https://www.stotles.com/ (compliance posture) + live probes of api.stotles.com.
+supersedes: >-
+  The 2026-07-21 revision of this file, which recorded "No public OpenAPI or documented OAuth
+  surface found" and "No public API specification published". That was WRONG — a complete OpenAPI
+  3.1.0 has been live at https://api.stotles.com/v1/openapi.json and an MCP server at
+  https://api.stotles.com/mcp. Both were found on 2026-08-14 by probing the API HOST ROOT rather
+  than the docs/marketing host. Corrected below.
+
 standards:
-- id: soc2-type-ii
-  conforms: true
-  evidence: Stotles publishes SOC 2 Type II certification on its website and Vanta trust center.
-- id: gdpr
-  conforms: true
-  evidence: Stotles states GDPR compliance for handling of EU/UK personal data.
-- id: oauth2
-  conforms: false
-  evidence: No public OpenAPI or documented OAuth surface found.
-- id: rfc9457-problem-details
-  conforms: false
-  evidence: No public API specification published.
+  - id: openapi-3.1
+    conforms: true
+    evidence: >-
+      Stotles publishes a valid OpenAPI 3.1.0 document at https://api.stotles.com/v1/openapi.json
+      (HTTP 200, application/json, 64,712 bytes). 8 operations, 4 tags, 9 component schemas, 5
+      reusable response components, typed parameters with bounds and enums, response examples on
+      every 200, and x-enumDescriptions on every enum value.
+    artifact: openapi/stotles-public-api-openapi.yml
+
+  - id: rfc9457-problem-details
+    conforms: true
+    evidence: >-
+      Every non-2xx response on all 8 operations returns application/problem+json against a single
+      ProblemDetails schema with required type/title/status, optional detail, and a structured
+      errors[] locator. Confirmed live: GET /v1/notices/search without a key returned
+      content-type application/problem+json and
+      {"type":"https://api.stotles.com/problems/unauthenticated","title":"Unauthenticated",
+      "status":401,"detail":"Missing or invalid API key."} on 2026-08-14. The provider states the
+      branching contract explicitly ("Branch on `type`, not on `title` or `detail`").
+    deviation: >-
+      The `type` URIs are not dereferenceable — https://api.stotles.com/problems/validation returns
+      404. RFC 9457 permits this but encourages documentation at the URI.
+    artifact: errors/stotles-problem-types.yml
+
+  - id: mcp
+    conforms: true
+    evidence: >-
+      A hosted MCP server is live at https://api.stotles.com/mcp, transport streamable-http,
+      self-describing on GET ("This is a Model Context Protocol endpoint... Add this URL to an MCP
+      client (Claude, Cursor, ChatGPT, etc.) with an x-api-key header"), and answering JSON-RPC on
+      POST. Marked Beta with a waitlist on https://www.stotles.com/integrations.
+    deviation: >-
+      Authentication is a static x-api-key header rather than the MCP OAuth flow; no
+      /.well-known/oauth-protected-resource or /.well-known/oauth-authorization-server is served, so
+      an MCP client cannot discover how to authorize. tools/list is gated (JSON-RPC -32001).
+    artifact: mcp/stotles-mcp.yml
+
+  - id: rfc3986-cursor-pagination
+    conforms: true
+    evidence: >-
+      Opaque-cursor pagination with `items` + `next_cursor`, terminated on next_cursor === null.
+      The provider documents both hazards (a short page is not the last page; cursors are opaque and
+      must be passed back byte-for-byte).
+    artifact: conventions/stotles-conventions.yml
+
+  - id: iso-3166-1-alpha-2
+    conforms: true
+    evidence: '"Country codes are ISO 3166-1 alpha-2 (GB, IE)." Applied on notice, buyer and supplier location fields.'
+
+  - id: iso-4217
+    conforms: true
+    evidence: 'Money is {amount, currency} where currency is an ISO 4217 code, nullable when the source did not state one.'
+
+  - id: iso-8601-calendar-dates
+    conforms: true
+    evidence: >-
+      "Dates are calendar dates, YYYY-MM-DD, never timestamps." All eight date fields use
+      OpenAPI format: date.
+
+  - id: cpv
+    conforms: true
+    evidence: >-
+      Notices, lots and contracts all carry cpv_codes[] {code, name} against the EU Common
+      Procurement Vocabulary — the classification standard for European public procurement. This is
+      the join key between Stotles data and every other EU/UK procurement dataset.
+    note: Domain-standard conformance, and the strongest interoperability signal on this API.
+
+  - id: semver-api-versioning
+    conforms: partial
+    evidence: >-
+      Version is carried in the path (/v1) with a published additive-only compatibility contract and
+      a commitment that breaking changes go to a new version. But info.version is a bare "1.0" with
+      no date and no changelog, so a consumer cannot detect that the contract has moved.
+    artifact: lifecycle/stotles-lifecycle.yml
+
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: >-
+      No Sunset or Deprecation header is declared in the spec or observed on live responses. Version
+      retirement is communicated out of band by a Customer Success Manager.
+
+  - id: rfc9239-ratelimit-headers
+    conforms: false
+    evidence: >-
+      Retry-After is declared on the 429 response, but no RateLimit / RateLimit-Policy or
+      X-RateLimit-* headers are published or observed on successful responses. A client cannot pace
+      itself proactively against the documented 1,000/hour and 3/second limits.
+    artifact: rate-limits/stotles-rate-limits.yml
+
+  - id: oauth2
+    conforms: false
+    evidence: >-
+      components.securitySchemes declares only `apiKey` (header x-api-key). No oauth2 or
+      openIdConnect scheme anywhere. /.well-known/oauth-authorization-server and
+      /.well-known/oauth-protected-resource both 404 on api.stotles.com.
+    artifact: authentication/stotles-authentication.yml
+
+  - id: oidc
+    conforms: false
+    evidence: >-
+      Enterprise SAML/SSO is sold for human login to app.stotles.com on the Expert tiers, but
+      app.stotles.com/.well-known/openid-configuration returns 404 and SSO does not extend to the API.
+
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on all four Stotles hosts (api, www, app, help). No
+      published vulnerability-disclosure contact.
+    artifact: well-known/stotles-well-known.yml
+
+  - id: asyncapi
+    conforms: false
+    applicable: false
+    evidence: >-
+      No event, streaming or webhook surface is published — nothing to describe with AsyncAPI. The
+      API is 8 polling GET operations. N/A rather than a failure.
+
+  - id: a2a-agent-card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and the legacy /.well-known/agent.json return 404 on all four
+      Stotles hosts. No A2A agent card is published.
+
+  - id: llms-txt
+    conforms: partial
+    evidence: >-
+      https://www.stotles.com/llms.txt returns HTTP 200 with a real 20,096-byte document (last
+      updated 2025-10-27) enumerating public pages, reports and blog posts with descriptions, plus
+      an explicit allow-list of AI crawlers.
+    deviation: >-
+      The published llms.txt predates the API and never mentions api.stotles.com, the OpenAPI, or
+      the MCP server. An agent reading Stotles' own llms.txt would conclude the company has no
+      programmable surface. It also mixes robots.txt User-agent/Allow directives into the llms.txt
+      format, which is not part of the llms.txt convention.
+    artifact: llms/stotles-llms.txt
+
+  - id: soc2-type-ii
+    conforms: true
+    evidence: >-
+      Stotles publishes SOC 2 Type II certification on its website and on its Vanta trust center
+      (https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm).
+    artifact: security/stotles-trust-center.yml
+
+  - id: gdpr
+    conforms: true
+    evidence: >-
+      Stotles states GDPR compliance for handling of EU/UK personal data. Materially relevant here:
+      the platform sells "decision maker contacts" — named personal data about public sector
+      employees — as a paid feature.
+
+  - id: uk-procurement-act-2023
+    conforms: true
+    applicable: true
+    evidence: >-
+      Domain-regulatory alignment rather than a technical standard. Stotles has publicly documented
+      its platform changes for the UK Procurement Act 2023 transition ("How Stotles is Evolving to
+      Support Suppliers in the Transition to the UK Procurement Act 2023", listed in its llms.txt)
+      and publishes a go-live playbook report. The notice stage vocabulary in the API
+      (pipeline / pre_tender / open_tender / closed_tender / awarded_contract / expired_contract)
+      maps onto the regime's procurement lifecycle.
+    note: >-
+      Recorded because the Kin Score applies the Government & Public Sector regulatory layer to this
+      provider. This is a claim about domain alignment, not an audited certification.
+
+  - id: fapi
+    conforms: false
+    applicable: false
+    evidence: Not a financial-services API; FAPI does not apply.
+
+  - id: fhir
+    conforms: false
+    applicable: false
+    evidence: Not a healthcare data API; FHIR does not apply.

@@ -1,0 +1,136 @@
+generated: '2026-08-14'
+method: probed
+status: published
+source: >-
+  https://api.stotles.com/mcp (live GET returns the server's own self-description; POST tools/list
+  returns JSON-RPC -32001 "Unauthorized: Missing API key") + https://www.stotles.com/integrations
+  (the provider's own product page describing "Stotles MCP", tagged Beta, with a waitlist CTA).
+
+deployment:
+  mode: remote
+  endpoint: https://api.stotles.com/mcp
+  install: null
+  package: null
+  auth: api-key
+  verified: probed
+
+server:
+  name: Stotles MCP server
+  transport: streamable-http
+  url: https://api.stotles.com/mcp
+  status: beta
+  access: waitlist
+  self_description: >-
+    "This is a Model Context Protocol endpoint, not a browser page. Add this URL to an MCP client
+    (Claude, Cursor, ChatGPT, etc.) with an x-api-key header." — returned verbatim by
+    GET https://api.stotles.com/mcp (HTTP 200, application/json), 2026-08-14.
+  product_description: >-
+    "Brings Stotles data into the chat tools and agents your team already uses. The Stotles MCP lets
+    them search Stotles market data directly. Teams can explore the market in natural language and
+    pull the insights they need without leaving their tools." — https://www.stotles.com/integrations
+  note: >-
+    This is a REMOTE, hosted endpoint an MCP client POSTs to directly — not an npx/stdio package a
+    human has to install first. No local-stdio distribution exists for Stotles in npm, PyPI or the
+    Stotles GitHub organization (see packages/stotles-packages.yml).
+
+auth:
+  methods:
+    - apikey
+  apikey:
+    header: x-api-key
+    issuance: >-
+      Keys are issued by Stotles on request — "Keys are issued by Stotles — ask your Customer
+      Success Manager" (OpenAPI info.description). MCP access is additionally gated behind a
+      published waitlist.
+    same_key_as_rest_api: >-
+      Not confirmed. The MCP endpoint and the REST API share a host and both authenticate with
+      `x-api-key`, but Stotles does not publish whether one key serves both surfaces. Do not assume.
+  oauth2:
+    supported: false
+    note: >-
+      No OAuth. /.well-known/oauth-protected-resource and /.well-known/oauth-authorization-server
+      both 404 on api.stotles.com (see well-known/stotles-well-known.yml). An MCP client cannot
+      perform discovery-based authorization against this server; the key must be pasted in.
+
+introspection:
+  attempted: '2026-08-14'
+  request: 'POST https://api.stotles.com/mcp {"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  http_status: 401
+  response: '{"jsonrpc":"2.0","error":{"code":-32001,"message":"Unauthorized: Missing API key"},"id":null}'
+  result: gated
+  note: >-
+    The live tool list is auth-gated, so the REAL tool names and inputSchemas could not be read.
+    Stotles publishes no MCP tool reference anywhere public — the provider's own llms.txt
+    (last updated 2025-10-27) does not mention the MCP server or the API at all. Everything under
+    `candidate_tools` below is therefore DERIVED from the OpenAPI operations, not observed.
+    Tool names and schemas MUST be confirmed by authenticated introspection before use.
+
+tool_count:
+  observed: null
+  candidate: 8
+
+candidate_tools:
+  status: candidate
+  method: derived
+  derived_from: openapi/stotles-public-api-openapi.yml
+  warning: >-
+    NOT the provider's tool list. These are the eight public REST operations the MCP server most
+    plausibly fronts, named in the conventional MCP verb_noun style. Names are inferred; the
+    parameter sets are real (inherited from the OpenAPI operations).
+  tools:
+    - name: search_notices
+      category: notices
+      rest: searchNotices
+      description: >-
+        Search and filter UK/IE public sector procurement notices by keyword, buyer, supplier, CPV
+        code, stage, framework, value range and date range; cursor-paginated, max 50 per page.
+    - name: get_notice
+      category: notices
+      rest: getNotice
+      description: Fetch a single procurement notice by UUID.
+    - name: search_buyers
+      category: buyers
+      rest: searchBuyers
+      description: >-
+        Search public sector buying organizations by name, filtered by country, buyer type
+        (23 values) and type group (central, local, healthcare, blue_light, education, other).
+    - name: get_buyer
+      category: buyers
+      rest: getBuyer
+      description: Fetch a single buyer by UUID, with its procurement activity.
+    - name: search_suppliers
+      category: suppliers
+      rest: searchSuppliers
+      description: Search suppliers bidding for and winning public sector contracts, by name and country.
+    - name: get_supplier
+      category: suppliers
+      rest: getSupplier
+      description: Fetch a single supplier by UUID.
+    - name: search_frameworks
+      category: frameworks
+      rest: searchFrameworks
+      description: >-
+        Search framework agreements and dynamic purchasing systems by name, stage and start/end
+        date range.
+    - name: get_framework
+      category: frameworks
+      rest: getFramework
+      description: Fetch a single framework agreement by UUID.
+
+crosswalk: mcp/stotles-tool-crosswalk.yml
+
+agent_notes:
+  - >-
+    Rate limits apply to the key, not the surface: 1,000 requests/hour and 3 requests/second
+    (see rate-limits/stotles-rate-limits.yml). An agent fanning out parallel tool calls will hit the
+    3 rps ceiling long before the hourly allowance.
+  - >-
+    Errors are RFC 9457 problem+json with a stable `type` URI — branch on `type`, never on `title`
+    or `detail` (see errors/stotles-problem-types.yml).
+  - >-
+    The entire surface is read-only (8 GET operations, no writes), so retries are naturally safe and
+    no idempotency key is needed or offered. See conventions/stotles-conventions.yml.
+  - >-
+    Discoverability gap worth reporting to the provider: Stotles serves an llms.txt at
+    www.stotles.com/llms.txt that never mentions api.stotles.com, the OpenAPI, or the MCP server.
+    An agent reading the published llms.txt would conclude Stotles has no programmable surface.

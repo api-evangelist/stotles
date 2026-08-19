@@ -1,0 +1,216 @@
+generated: '2026-08-14'
+method: derived
+source: >-
+  Derived from the 9 components.schemas and the id-reference fields in
+  openapi/stotles-public-api-openapi.yml (OpenAPI 3.1.0, harvested verbatim from
+  https://api.stotles.com/v1/openapi.json on 2026-08-14). Enum vocabularies and their
+  x-enumDescriptions are quoted from the spec.
+docs: https://api.stotles.com/v1/openapi.json
+
+notation: >-
+  Four addressable root entities (Notice, Buyer, Supplier, Framework), each with a `/search` and a
+  `/{id}` operation, plus five embedded value objects that are returned inline and are NOT
+  independently addressable. Every identifier is a UUID, and — per the provider's own convention
+  statement — the `id` a resource returns is the same `id` you filter by. Relationship direction is
+  from the entity that owns the reference field.
+
+identifier_grammar:
+  type: uuid
+  round_trippable: true
+  statement: >-
+    "Identifiers are UUIDs. The `id` a resource returns is the same `id` you filter by (`buyer_id`,
+    `supplier_id`, `framework_id`)." — Stotles Public API, info.description.
+  note: >-
+    There is no prefix or namespace on Stotles ids (no `urn:` form, no `not_`/`buy_` prefix). A bare
+    UUID carries no type information, so a client must track which entity an id came from. Lot ids
+    are the exception — they are plain strings scoped to their parent notice, not UUIDs, and are
+    NOT globally addressable.
+
+entities:
+  - name: Notice
+    schema: [NoticeResponseDto, NoticeSearchResponseDto]
+    addressable: true
+    operations: {search: searchNotices, get: getNotice}
+    id_type: uuid
+    domain: procurement
+    description: >-
+      A public sector procurement notice — the central record. Spans the whole lifecycle from a
+      forward-plan signal through open tender to awarded and expired contract, so "notice" here
+      means an opportunity record, not strictly one published document.
+    key_fields: [id, title, description, country_code, stage, source_url, publish_date, close_date,
+      award_date, expiry_date, value, buyers, cpv_codes, framework, lots, contracts]
+    filterable_by: [query, country_code, cpv_code, buyer_id, supplier_id, stage, framework_id,
+      framework_activity, publish_date, close_date, expiry_date, award_date, value]
+    note: >-
+      `source_url` links back to the originating portal record (e.g. find-tender.service.gov.uk),
+      which is the provenance escape hatch for anything Stotles has normalized.
+
+  - name: Buyer
+    schema: [BuyerResponseDto, BuyerSearchResponseDto]
+    addressable: true
+    operations: {search: searchBuyers, get: getBuyer}
+    id_type: uuid
+    domain: organizations
+    description: A public sector buying organization (contracting authority).
+    key_fields: [id, name, location, employee_count_band, website_url, types]
+    filterable_by: [query, country_code, type, type_group]
+    note: '`query` is REQUIRED on searchBuyers — there is no browse-all-buyers mode.'
+
+  - name: Supplier
+    schema: [SupplierDto, SupplierSearchResponseDto]
+    addressable: true
+    operations: {search: searchSuppliers, get: getSupplier}
+    id_type: uuid
+    domain: organizations
+    description: >-
+      A company bidding for and winning public sector contracts. The thinnest entity on the surface
+      — four fields only.
+    key_fields: [id, name, location, award_count]
+    filterable_by: [query, country_code]
+    note: >-
+      `award_count` is an all-time contract count and is the only supplier metric exposed. There is
+      no supplier→notice traversal operation; to get a supplier's awards you filter
+      searchNotices by `supplier_id`.
+
+  - name: Framework
+    schema: [FrameworkResponseDto, FrameworkSearchResponseDto]
+    addressable: true
+    operations: {search: searchFrameworks, get: getFramework}
+    id_type: uuid
+    domain: procurement
+    description: >-
+      A framework agreement or dynamic purchasing system — a pre-competed vehicle that call-off
+      contracts are awarded under.
+    key_fields: [id, title, description, service_provider, stage, procedure_type, value,
+      start_date, end_date]
+    filterable_by: [query, stage, start_date, end_date]
+
+embedded_objects:
+  - name: Money
+    addressable: false
+    shape: '{amount: number, currency: string|null}'
+    appears_on: [Notice.value, Lot.value, Contract.value, Framework.value]
+    note: >-
+      "The amount as a JSON number, byte-aligned with the upstream feed. Parse with a big-decimal
+      library — do not rely on IEEE-754 float arithmetic." `currency` is ISO 4217, null when the
+      source did not state one. The whole object is null when no amount is known.
+  - name: CpvCode
+    addressable: false
+    shape: '{code: string, name: string}'
+    appears_on: [Notice.cpv_codes, Lot.cpv_codes, Contract.cpv_codes]
+    note: >-
+      Common Procurement Vocabulary — the EU classification taxonomy. This is the join key to
+      external procurement datasets and the main way to slice a market by category.
+  - name: Lot
+    addressable: false
+    id_type: 'string (scoped to the parent notice, NOT a UUID)'
+    shape: '{id, title, description, value, cpv_codes, contract_period}'
+    appears_on: [Notice.lots, Contract.lots]
+    note: A notice divided into separately-awardable parts. Lot ids are not globally resolvable.
+  - name: Contract
+    addressable: false
+    shape: '{title, description, value, award_date, contract_period, cpv_codes, suppliers, lots}'
+    appears_on: [Notice.contracts]
+    note: >-
+      An award made under a notice. This is where the supplier linkage lives — Contract.suppliers[]
+      carries {id, name}. There is no top-level /contracts operation; contracts are only reachable
+      through their notice.
+  - name: ContractPeriod
+    addressable: false
+    shape: '{start_date, end_date, max_extent_date}'
+    appears_on: [Lot.contract_period, Contract.contract_period]
+    note: >-
+      `end_date` is the EARLIEST expected end; `max_extent_date` is the latest date the period can
+      be extended to. Modelling renewal risk requires both.
+  - name: BuyerType
+    addressable: false
+    shape: '{id, name, group: {id, name}}'
+    appears_on: [Buyer.types]
+    note: A buyer carries MANY types; each type rolls up to exactly one group.
+  - name: Location
+    addressable: false
+    shape: '{country_code, locality?}'
+    appears_on: [Buyer.location, Supplier.location]
+    note: >-
+      Buyer.location.country_code is an EMPTY STRING when unknown; Buyer.location.locality is NULL
+      when unknown. Both on the same object — a live example of the provider's stated
+      empty-string-vs-null policy.
+
+relationships:
+  - {from: Notice, to: Buyer, kind: has_many, via: 'buyers[].id', note: 'A notice can name multiple buying authorities.'}
+  - {from: Notice, to: Framework, kind: has_one, via: 'framework.id', note: 'Null when the notice is unrelated to any framework. Carries a `relationship` discriminator.'}
+  - {from: Notice, to: Lot, kind: has_many, via: 'lots[]', note: embedded}
+  - {from: Notice, to: Contract, kind: has_many, via: 'contracts[]', note: embedded}
+  - {from: Notice, to: CpvCode, kind: has_many, via: 'cpv_codes[]', note: embedded}
+  - {from: Contract, to: Supplier, kind: has_many, via: 'suppliers[].id'}
+  - {from: Contract, to: Lot, kind: has_many, via: 'lots[]', note: 'Which lots this award covers.'}
+  - {from: Framework, to: Buyer, kind: has_one, via: 'service_provider.id', note: 'The organization that operates the framework (e.g. a purchasing organization such as CCS). Typed as a bare {id,name} organisation reference.'}
+  - {from: Buyer, to: BuyerType, kind: has_many, via: 'types[]'}
+  - {from: BuyerType, to: BuyerTypeGroup, kind: belongs_to, via: 'group.id'}
+  - {from: Buyer, to: Notice, kind: has_many, via: 'searchNotices?buyer_id=', note: 'Reverse traversal is a FILTER, not a sub-resource. There is no /v1/buyers/{id}/notices.'}
+  - {from: Supplier, to: Notice, kind: has_many, via: 'searchNotices?supplier_id=', note: 'Reverse traversal is a FILTER. There is no /v1/suppliers/{id}/notices.'}
+  - {from: Framework, to: Notice, kind: has_many, via: 'searchNotices?framework_id=', note: 'Reverse traversal is a FILTER. Combine with framework_activity to separate the framework-establishing notice from its call-offs.'}
+
+traversal_note: >-
+  This API has NO sub-resource paths. Every relationship is navigated by taking an id out of one
+  response and passing it as a filter to searchNotices. That makes searchNotices the hub of the
+  whole graph: buyer→notices, supplier→notices and framework→notices all route through it. An agent
+  building a market picture will call searchNotices far more than any other operation, which is
+  exactly the call pattern the 3 requests/second ceiling constrains.
+
+vocabularies:
+  notice_stage:
+    field: Notice.stage
+    values: [pipeline, pre_tender, stale_pre_tender, open_tender, closed_tender, canceled_tender,
+      unknown_tender, awarded_contract, expired_contract, canceled_award]
+    documented_inline: true
+    note: >-
+      Every value carries an x-enumDescriptions entry in the spec — an unusually good practice. One
+      trap is stated outright by the provider: "an `expired_contract` can still carry a future
+      `expiry_date` — don't infer timing from the stage."
+  framework_stage:
+    field: Framework.stage
+    values: [stale, upcoming, tendering, closed, awarded, live, expired, canceled]
+    note: A DIFFERENT vocabulary from notice_stage. Do not share an enum type between them.
+  framework_relationship:
+    field: Notice.framework.relationship
+    values: [framework_agreement, call_off]
+  framework_procedure_type:
+    field: Framework.procedure_type
+    values: [framework, dynamic_purchasing_system, null]
+  framework_activity_filter:
+    parameter: framework_activity
+    values: [only_framework_agreements, only_call_offs, exclude_framework_agreements, exclude_all]
+    note: >-
+      A filter, not a field. Critical for double-counting: a framework-establishing notice and its
+      call-offs both appear in unfiltered results, so summing `value` across both inflates market
+      size. Use `only_call_offs` or `exclude_framework_agreements` when totalling spend.
+  buyer_type:
+    field: Buyer.types[].id
+    values: [ministerial_department, non_ministerial_department, agencies_and_non_departmental_bodies,
+      other_central, devolved_department, local_authority, purchasing_organization, parish_council,
+      other_local_organization, central_healthcare_organizations, nhs_trusts, nhs_ccg_stp_ics,
+      other_healthcare, police, fire, ambulance, other_blue_light, schools,
+      higher_and_further_education, other_education, housing_associations, other_public_sector,
+      utilities]
+    count: 23
+  buyer_type_group:
+    field: Buyer.types[].group.id
+    values: [central, local, healthcare, blue_light, education, other]
+    count: 6
+  cpv:
+    field: '*.cpv_codes[].code'
+    external_standard: EU Common Procurement Vocabulary
+    note: Not enumerated in the spec; an open external taxonomy.
+  country:
+    field: '*.country_code'
+    external_standard: ISO 3166-1 alpha-2
+    observed: [GB, IE]
+  currency:
+    field: '*.value.currency'
+    external_standard: ISO 4217
+    nullable: true
+
+render:
+  subway: null
+  note: No subway/ diagram exists for this provider yet.

@@ -1,0 +1,213 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  The "Pagination", "Errors", "Conventions", "Versioning and stability" and "Rate limits" sections
+  that Stotles writes into info.description of its own OpenAPI
+  (https://api.stotles.com/v1/openapi.json, HTTP 200, harvested 2026-08-14), corroborated by the
+  parameter/schema shapes in the spec and by live unauthenticated responses from api.stotles.com.
+summary: >-
+  Stotles ships an unusually well-specified small API: 8 read-only GET operations whose
+  cross-cutting semantics — casing, identifier type, date format, money representation, multi-value
+  filters, range operators, null-vs-empty-string policy, cursor pagination and RFC 9457 errors —
+  are all stated explicitly by the provider rather than left to be inferred. Idempotency is the one
+  concept absent, and it is absent for a defensible reason (see below).
+
+authentication:
+  style: api_key_header
+  header: x-api-key
+  see: authentication/stotles-authentication.yml
+
+casing_and_types:
+  field_case: snake_case
+  query_parameter_case: snake_case
+  statement: '"Field names and query parameters are `snake_case`."'
+  identifiers:
+    type: uuid
+    statement: >-
+      "Identifiers are UUIDs. The `id` a resource returns is the same `id` you filter by
+      (`buyer_id`, `supplier_id`, `framework_id`)."
+    note: >-
+      Round-trippable identifiers: the id on a returned object is directly usable as a filter value
+      on another operation. This is what makes multi-step agent workflows possible on this API.
+  dates:
+    format: 'YYYY-MM-DD (calendar date, RFC 3339 full-date)'
+    timestamps: false
+    statement: >-
+      "Dates are calendar dates, `YYYY-MM-DD`, never timestamps. There is no meaningful empty date,
+      so an unknown date is `null`."
+  money:
+    shape: '{ "amount": <decimal>, "currency": <ISO 4217 or null> }'
+    minor_units: false
+    statement: >-
+      "Money is a decimal amount plus a currency — { \"amount\": 4500000, \"currency\": \"GBP\" } —
+      not integer minor units. Amounts can be large and are estimates, so parse them with a
+      big-decimal type rather than a float. `currency` can be `null` when the source didn't state
+      one."
+    agent_risk: >-
+      Contract values here reach nine figures. Parsing `amount` as an IEEE-754 double will silently
+      lose precision on large awards. The provider says so; honour it.
+  country_codes:
+    format: ISO 3166-1 alpha-2
+    observed_values: [GB, IE]
+  null_policy:
+    statement: >-
+      "Unknown optional text is an empty string where blank is meaningful, and `null` where absence
+      is meaningful. Each field's description says which."
+    note: Empty string and null are NOT interchangeable in this API. Read the per-field description.
+
+filtering:
+  multi_value:
+    style: repeated_parameter
+    example: '?stage=open_tender&stage=closed_tender'
+    semantics: OR within a parameter
+    statement: >-
+      "Multi-value filters repeat the parameter: `?stage=open_tender&stage=closed_tender` matches
+      either. Don't comma-join values."
+    caps: >-
+      Array parameters carry explicit maxItems in the spec — query 50, country_code 100,
+      cpv_code 100, buyer_id 100, supplier_id 100, framework_id 100, stage 10, buyer type 23.
+  range_filters:
+    style: explicit_operator_suffix
+    suffixes: [_gte, _lte]
+    inclusive: true
+    statement: >-
+      "Range filters carry an explicit operator suffix — `publish_date_gte`, `value_lte`. Both
+      bounds are inclusive."
+    fields: [publish_date, close_date, expiry_date, award_date, value, start_date, end_date]
+  keyword_search:
+    parameter: query
+    operator_parameter: query_operator
+    operator_values: [and, or]
+    operator_default: or
+    note: >-
+      On /v1/notices/search, `query` is an ARRAY of terms (repeat the parameter) combined by
+      `query_operator`. On /v1/buyers/search and /v1/suppliers/search, `query` is a single REQUIRED
+      string. Same parameter name, different type and requiredness per operation — the single
+      sharpest inconsistency on this surface and the most likely source of agent 400s.
+
+pagination:
+  style: opaque_cursor
+  request_parameters:
+    cursor: cursor
+    limit: limit
+  limit_bounds: {min: 1, max: 50, default: 20}
+  response_fields:
+    items: items
+    next_cursor: next_cursor
+  termination: 'next_cursor === null'
+  statement: >-
+    "List endpoints (/search) return an `items` array plus a top-level `next_cursor`. To read the
+    next page, pass that value back as `?cursor=…`. Keep going until `next_cursor` is `null`."
+  hazards:
+    - >-
+      "A short page is not the last page." A page can contain fewer than `limit` items and still
+      have more results behind it. Only `next_cursor: null` ends the loop. An agent that stops when
+      `items.length < limit` will silently truncate results.
+    - >-
+      "Cursors are opaque. Pass them back byte-for-byte. Don't decode, construct or persist them —
+      the encoding is an implementation detail and may change." (The published example cursor
+      base64-decodes to `{"page":2,"limit":20}`; do not rely on that.)
+
+sorting:
+  parameters: {sort: sort, order: order}
+  order_values: [asc, desc]
+  order_default: desc
+  sortable_fields:
+    notices: [publish_date, close_date, award_date, expiry_date, value]
+    frameworks: [title, start_date, end_date, stage, value]
+
+errors:
+  envelope: rfc9457
+  content_type: application/problem+json
+  branch_on: type
+  statement: >-
+    "Branch on `type`, not on `title` or `detail` — `type` is a stable identifier per error
+    category; the human-readable fields may be reworded."
+  validation_locator:
+    field: errors[]
+    variants:
+      - {key: parameter, meaning: a query or path parameter}
+      - {key: pointer, meaning: a request body field}
+      - {key: header, meaning: a header}
+  see: errors/stotles-problem-types.yml
+
+idempotency:
+  documented: false
+  header: null
+  supported: not_applicable
+  reason: >-
+    The entire published surface is 8 GET operations. There is no write path — no POST, PUT, PATCH
+    or DELETE anywhere in the spec — so every request is idempotent by HTTP method and there is
+    nothing for an idempotency key to protect. A retry after a timeout is always safe here.
+  pointer_policy: >-
+    NO `Idempotency` pointer is emitted in apis.yml for this provider. Not because the artifact is
+    missing, but because the concept does not apply to a read-only surface. If Stotles ever ships a
+    write operation (e.g. saving a search, creating a tracked opportunity), this becomes a real gap
+    and an Idempotency-Key mechanism should be requested.
+
+rate_limiting:
+  documented: true
+  limits: {per_hour: 1000, per_second: 3, scope: per-api-key}
+  exhaustion_status: 429
+  response_header: Retry-After
+  runtime_signal_gap: >-
+    Stotles documents the numbers but publishes NO X-RateLimit-*/RateLimit-* headers on successful
+    responses — the only runtime signal is Retry-After, and it only arrives AFTER you have already
+    been throttled. An agent cannot pace itself proactively; it can only back off reactively.
+  see: rate-limits/stotles-rate-limits.yml
+
+request_tracing:
+  header: request-id
+  method: probed
+  documented: false
+  observed: >-
+    Every response from api.stotles.com carries a `request-id` header (e.g.
+    BIUd-VTxIzwCOe45qIRmDDWTAZBqhPozbRmnNobNazCrTEXsG_eZ6w==), including 401s. It is the CloudFront
+    x-amz-cf-id value, echoed. Undocumented by Stotles, but it is the identifier to quote to support.
+  probed_at: '2026-08-14'
+
+versioning:
+  style: path
+  current: v1
+  base_url: https://api.stotles.com/v1
+  compatibility_contract: >-
+    "Within a version we make only additive changes — new endpoints, new optional parameters, new
+    response fields — so write clients that ignore fields they don't recognize. Anything breaking
+    (removing or renaming a field, changing a type, tightening validation) goes in a new version,
+    and we will contact you before retiring one."
+  tolerant_reader_required: true
+  see: lifecycle/stotles-lifecycle.yml
+
+field_expansion:
+  supported: false
+  note: No sparse-fieldset, `expand`, `fields` or `include` parameter exists. Responses are fixed shape.
+
+metadata:
+  user_defined_fields: false
+  note: No customer-defined metadata can be attached to any object via the API.
+
+transport_security:
+  observed_headers:
+    - "content-security-policy: default-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none'; sandbox"
+    - 'cross-origin-opener-policy: same-origin'
+    - 'cross-origin-resource-policy: same-origin'
+    - 'referrer-policy: no-referrer'
+    - 'x-content-type-options: nosniff'
+    - 'origin-agent-cluster: ?1'
+  cors:
+    access_control_allow_origin: https://app.stotles.com
+    note: >-
+      CORS is pinned to the Stotles web app only. A browser-based third-party client CANNOT call
+      this API directly; it must proxy through a server. That is the correct posture for a static
+      secret key, and it is worth knowing before designing a front-end integration.
+  method: probed
+  probed_at: '2026-08-14'
+  edge: 'Amazon CloudFront (via: 1.1 …cloudfront.net; x-amz-cf-pop: JFK50-P2)'
+  http_versions: [h2, h3]
+
+cross_references:
+  authentication: authentication/stotles-authentication.yml
+  errors: errors/stotles-problem-types.yml
+  lifecycle: lifecycle/stotles-lifecycle.yml
+  rate_limits: rate-limits/stotles-rate-limits.yml
+  data_model: data-model/stotles-data-model.yml

@@ -1,0 +1,243 @@
+generated: '2026-08-14'
+method: searched
+source: https://www.stotles.com/pricing
+http_status: 200
+checked: '2026-08-14'
+currency: GBP
+billing_period: monthly
+plan_count: 11
+
+summary: >-
+  Stotles publishes list prices for three product lines — Sales Studio, Bid Studio and the combined
+  B2G Growth Engine — across Free / Basic / Growth / Expert tiers. Prices are "from" figures with
+  Expert always custom. CRITICALLY FOR THIS PIPELINE: no tier on this page mentions API access, an
+  API quota, or the MCP server. The Stotles Public API is not a purchasable line item; it is
+  obtained through a Customer Success Manager, and MCP access is waitlisted.
+
+api_access:
+  attached_to_any_published_tier: false
+  self_serve: false
+  detail: >-
+    The word "API" does not appear in any tier's feature list. The closest entries are "Integration
+    support" (Sales Studio Expert), "Custom integrations — Custom pricing" (Sales Studio compare
+    table) and "Custom integration support" (B2G Growth Engine Expert). The API's own documentation
+    says keys are "issued by Stotles — ask your Customer Success Manager", and the integrations page
+    offers a "Book a call" CTA for the API and a "Join the waitlist" CTA for MCP.
+  implication: >-
+    An agent developer cannot price, buy, or provision Stotles API access without a sales
+    conversation. The programmable surface exists and is well-built, but it sits entirely behind a
+    commercial gate.
+
+data_quality_note: >-
+  The pricing page contradicts itself on two tiers, in the same page load on 2026-08-14. Recorded as
+  observed rather than reconciled:
+  (1) Sales Studio Basic is "From £75 / month" in the tier card, "From £50 / month" in the
+      Compare-plans table, and "from £99 / month" in the B2G-tab rendering of the same tier.
+  (2) Bid Studio Growth is "from £990 / month" in the tier card and Compare-plans table, and
+      "from £495 / month" in the B2G-tab rendering.
+  Treat the higher figure as the safer planning number and confirm with sales.
+
+plans:
+  # ---- Sales Studio ----
+  - product: Sales Studio
+    name: Free
+    price: 0
+    currency: GBP
+    period: month
+    price_display: '£0 / month'
+    custom_price: false
+    cta: Get started
+    self_serve: true
+    includes: [Tender tracking, Pre-tenders]
+    api_access: false
+
+  - product: Sales Studio
+    name: Basic
+    price: 75
+    price_qualifier: from
+    currency: GBP
+    period: month
+    price_display: 'From £75 / month'
+    custom_price: false
+    cta: Get started
+    self_serve: true
+    audience: for individuals
+    includes: [Everything in Free, Upcoming expiring contracts, Live chat support]
+    api_access: false
+    note: >-
+      Also rendered as "From £50 / month" in the Compare-plans table and "from £99 / month" in the
+      B2G tab of the same page. See data_quality_note.
+
+  - product: Sales Studio
+    name: Growth
+    price: 475
+    price_qualifier: from
+    currency: GBP
+    period: month
+    price_display: 'From £475 / month'
+    custom_price: false
+    cta: Get in touch
+    self_serve: false
+    audience: for small teams
+    includes: [Everything in Basic, Buyer and competitor/partner intelligence,
+      Core customer success support, 'Deep-dive data like frameworks, documents and spend',
+      Decision maker contacts]
+    api_access: false
+
+  - product: Sales Studio
+    name: Expert
+    price: null
+    currency: GBP
+    period: month
+    price_display: Custom price
+    custom_price: true
+    cta: Get in touch
+    self_serve: false
+    audience: for large teams
+    includes: [Everything in Growth, Market analysis suite,
+      'Advanced Customer support, advisory and enablement', Multi-team configuration,
+      Integration support]
+    api_access: unstated
+    note: '"Integration support" is the only tier feature that plausibly covers API enablement, but the page does not say so.'
+
+  # ---- Bid Studio ----
+  - product: Bid Studio
+    name: Free
+    price: 0
+    currency: GBP
+    period: month
+    price_display: '£0'
+    custom_price: false
+    cta: Get started
+    self_serve: true
+    includes: ['3 AI Bid / No-bid reports (lifetime)', Tender tracking + alerts,
+      Self-serve customer support]
+    quotas: {ai_bid_no_bid_reports: '3 lifetime'}
+    api_access: false
+
+  - product: Bid Studio
+    name: Growth
+    price: 990
+    price_qualifier: from
+    currency: GBP
+    period: month
+    price_display: 'from £990 / month'
+    custom_price: false
+    cta: Get in touch
+    self_serve: false
+    audience: for low-frequency bid teams
+    includes: [Everything in Free, 15 AI Bid / No-bid reports per month, 5 bid projects a month,
+      Collaborator seat availability, 'Secure, hosted bid content library',
+      AI responses powered by Stotles market data, 'Dedicated customer success - Gold tier']
+    quotas: {ai_bid_no_bid_reports: 15/month, active_bid_projects: 5/month}
+    api_access: false
+    note: Rendered as "from £495 / month" in the B2G tab of the same page. See data_quality_note.
+
+  - product: Bid Studio
+    name: Expert
+    price: null
+    currency: GBP
+    period: month
+    price_display: Custom price
+    custom_price: true
+    cta: Get in touch
+    self_serve: false
+    audience: for high-frequency bid teams
+    includes: [Everything in Growth, Unlimited AI Bid / No-bid reports per month,
+      Unlimited active bid projects, Enterprise SAML/Single sign-on,
+      'Multi-team instances & configurations', 'Dedicated customer success - Platinum tier']
+    quotas: {ai_bid_no_bid_reports: unlimited, active_bid_projects: unlimited}
+    api_access: unstated
+
+  # ---- B2G Growth Engine (combined) ----
+  - product: B2G Growth Engine
+    name: Growth
+    price: 873
+    price_qualifier: from
+    currency: GBP
+    period: month
+    price_display: 'from £873 / month'
+    custom_price: false
+    cta: Book a Call
+    self_serve: false
+    audience: for small teams
+    includes: [Buyer intent and expiring contract signals,
+      'Competitor, partner, and framework tracking', AI bid/no-bid scoring and AI responses,
+      Bid project management]
+    api_access: false
+
+  - product: B2G Growth Engine
+    name: Expert
+    price: null
+    currency: GBP
+    period: month
+    price_display: Custom price
+    custom_price: true
+    cta: Book a Call
+    self_serve: false
+    audience: for large teams
+    includes: [Everything in Growth, Market analysis suite, Dedicated advisory and enablement,
+      Custom integration support, 'Multi-team instances & configurations']
+    api_access: unstated
+
+  # ---- Standalone commercial surfaces ----
+  - product: Integrations
+    name: Custom integrations
+    price: null
+    currency: GBP
+    period: null
+    price_display: Custom pricing
+    custom_price: true
+    self_serve: false
+    note: >-
+      Listed as a row in the Sales Studio Compare-plans table, priced "Custom pricing" on both
+      Growth and Expert. Salesforce, HubSpot, MS Teams and Slack are marked "Self serve" on lower
+      tiers and "Supported" on Expert.
+    api_access: unstated
+
+  - product: Stotles API
+    name: Stotles API
+    price: null
+    price_display: not published
+    custom_price: true
+    self_serve: false
+    cta: Book a call
+    source: https://www.stotles.com/integrations
+    description: >-
+      "Gives your team direct access to Stotles data to power your own systems and workflows. Feed
+      it into internal dashboards and reporting or integrate it with your existing tools and
+      systems, all drawing on the same data available across Stotles."
+    api_access: true
+    note: >-
+      Not on the pricing page at all — only described on the integrations page, with no price and a
+      Book-a-call CTA. Recorded here as an unpriced commercial surface so the zero is explicit.
+
+support_tiers:
+  note: Customer success is sold as a separate three-tier ladder attached to plans.
+  tiers:
+    - {name: Silver, description: Light touch CS input to support achieving your desired outcomes.}
+    - {name: Gold, description: 'Proactive support and guidance to maximise ROI.', bundled_with: Bid Studio Growth}
+    - {name: Platinum, description: 'Enterprise grade high-touch strategic partnership.', bundled_with: Bid Studio Expert}
+
+addons:
+  price_published: false
+  items:
+    - {name: Research credits, description: 'Custom market research & analysis services to understand more and plan faster.'}
+    - {name: Managed FOI requests, description: 'Freedom of information request services to uncover deeper intel than your competitors.'}
+    - {name: Business process building, description: 'Go-to-market business process design to maximise tool utilisation & generate repeatable revenue.'}
+    - {name: Training packages, description: 'Sales training and bid training to upskill your teams and scale your growth.'}
+
+free_tier:
+  exists: true
+  note: >-
+    Both Sales Studio and Bid Studio have a genuinely free, self-serve £0 tier with a real (if small)
+    entitlement — tender tracking and pre-tenders, or 3 lifetime AI bid/no-bid reports. The free tier
+    is UI-only; it grants no API access.
+
+trial:
+  published: false
+
+cross_references:
+  rate_limits: rate-limits/stotles-rate-limits.yml
+  authentication: authentication/stotles-authentication.yml
+  mcp: mcp/stotles-mcp.yml

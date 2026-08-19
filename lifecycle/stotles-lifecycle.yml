@@ -1,0 +1,114 @@
+generated: '2026-08-14'
+method: searched
+source: >-
+  The "Versioning and stability" and "Support" sections Stotles writes into info.description of its
+  own OpenAPI (https://api.stotles.com/v1/openapi.json, harvested 2026-08-14), plus live probes of
+  candidate status-page and changelog URLs on 2026-08-14.
+docs: https://api.stotles.com/v1/openapi.json
+
+versioning:
+  scheme: path
+  current_version: v1
+  spec_info_version: '1.0'
+  base_url: https://api.stotles.com/v1
+  published_policy: true
+  policy_statement: >-
+    "The version is in the path (/v1). Within a version we make only additive changes — new
+    endpoints, new optional parameters, new response fields — so write clients that ignore fields
+    they don't recognize. Anything breaking (removing or renaming a field, changing a type,
+    tightening validation) goes in a new version, and we will contact you before retiring one."
+  compatibility_contract:
+    additive_within_version: true
+    breaking_changes_require_new_version: true
+    tolerant_reader_expected: true
+    breaking_change_examples_given: [removing a field, renaming a field, changing a type, tightening validation]
+  assessment: >-
+    This is a real, specific stability contract — it names what counts as breaking and states the
+    obligation it places on clients. Stronger than most providers of this size. What it lacks is a
+    NOTICE PERIOD: "we will contact you before retiring one" commits to contact, not to a number of
+    days, and the contact channel is a Customer Success Manager rather than a public announcement.
+
+deprecation:
+  policy_published: partial
+  policy_statement: '"we will contact you before retiring one" (version retirement only)'
+  notice_period_days: null
+  rfc8594_sunset_header: false
+  deprecation_header: false
+  evidence: >-
+    No `Sunset` or `Deprecation` header is declared anywhere in the OpenAPI and none was observed on
+    live responses from api.stotles.com on 2026-08-14. No RFC 8594 signalling.
+  deprecated_operations: []
+  deprecated_operations_note: >-
+    Zero of the 8 operations carry `deprecated: true`. The API is at its first version; nothing has
+    been deprecated yet.
+  gap: >-
+    Version retirement is communicated out of band, per-customer, by a CSM. There is no public
+    deprecation register, no machine-readable Sunset signal, and no stated minimum notice window. An
+    automated client has no runtime way to learn that /v1 is being retired.
+  pointer_policy: >-
+    A `Deprecation` pointer IS emitted for this provider: a published, quotable version-retirement
+    and breaking-change policy exists, which is what that check reads. The absence of Sunset headers
+    is recorded above as the gap it is.
+
+status_page:
+  exists: false
+  checked: '2026-08-14'
+  probes:
+    - {url: 'https://status.stotles.com/', status: 000, result: 'DNS does not resolve'}
+    - {url: 'https://stotles.statuspage.io/', status: 200, result: 'FALSE POSITIVE — redirects to the Atlassian Statuspage marketing site (<title>Real-Time Incident Communication with Statuspage | Atlassian</title>), not a Stotles status page. Do not wire this as a StatusPage pointer.'}
+    - {url: 'https://api.stotles.com/health', status: 404, result: 'no health endpoint'}
+  note: >-
+    Stotles publishes no status page and no health/ping endpoint. There is no way for a customer or
+    an agent to distinguish a Stotles outage from their own network failure, and no incident history.
+    NO `StatusPage` pointer is emitted.
+
+changelog:
+  page: https://www.stotles.com/changelog
+  http_status: 200
+  usable: false
+  checked: '2026-08-14'
+  note: >-
+    The page exists and is styled as a dated changelog, but it is an UNPOPULATED Webflow template:
+    the three visible entries (dated August 7, 9 and 11, 2026) are titled "Feature 3", "Feature 4"
+    and "Feature 5", each carrying the identical placeholder body, followed by "Improvement 1/2/3"
+    and "Product fix 1/2". No real release content. See changelog/stotles-changelog.yml. NO
+    `ChangeLog` pointer is emitted — the surface is published but carries no entries.
+  api_changelog: false
+  api_changelog_note: >-
+    There is no API-specific changelog, release-notes feed, or spec version history anywhere. The
+    OpenAPI carries info.version "1.0" with no date, so a consumer cannot tell when the contract
+    last changed or diff it against a previous capture. This repo's openapi/_original/ capture dated
+    2026-08-14 is now the earliest known baseline.
+
+sla:
+  published: false
+  note: >-
+    No uptime SLA, latency target, or support-response commitment is published on the pricing page,
+    the terms and conditions, or in the API documentation. The Expert tiers advertise "advanced
+    support" and "dedicated advisory" in commercial terms only.
+
+support:
+  channel: Customer Success Manager
+  statement: >-
+    "For questions, bug reports, or requests for data we don't expose yet, contact your Stotles
+    Customer Success Manager."
+  public_developer_channel: false
+  note: >-
+    There is no public developer support channel — no forum, no community Slack/Discord, no
+    developer email, no public issue tracker. `info.contact` in the spec names "Stotles API Support"
+    with url https://www.stotles.com (the marketing homepage) and NO email address. Every support
+    path runs through an existing commercial relationship.
+  contact_in_spec: {name: Stotles API Support, url: 'https://www.stotles.com', email: null}
+
+availability_posture:
+  api_access_self_serve: false
+  note: >-
+    API keys are issued by a CSM and MCP access is waitlisted. The API is in market but is not
+    self-serve; it is an entitlement of a commercial relationship rather than a product anyone can
+    sign up for. That is the defining lifecycle fact about this surface.
+
+cross_references:
+  conventions: conventions/stotles-conventions.yml
+  authentication: authentication/stotles-authentication.yml
+  rate_limits: rate-limits/stotles-rate-limits.yml
+  changelog: changelog/stotles-changelog.yml

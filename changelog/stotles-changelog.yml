@@ -1,0 +1,58 @@
+generated: '2026-08-14'
+method: searched
+source: https://www.stotles.com/changelog
+http_status: 200
+scheme: dated-entries (template only)
+entry_count: 0
+current_version: null
+
+summary: >-
+  Stotles publishes a /changelog page and it returns HTTP 200, but it is an UNPOPULATED Webflow
+  template. Every entry is placeholder copy. There is no usable release history, and no API-specific
+  changelog anywhere on the Stotles surface.
+
+finding:
+  page_present: true
+  entries_present: false
+  detail: >-
+    The page renders three dated entries — August 11, August 9 and August 7, 2026 — titled
+    "Feature 5", "Feature 4" and "Feature 3". All three carry the IDENTICAL body text ("Buyer Q&A now
+    pulls Documents data and web search…"), and each is followed by list items literally reading
+    "Improvement 1", "Improvement 2", "Improvement 3", "Product fix 1", "Product fix 2", plus a
+    "Plan tag" placeholder. This is CMS boilerplate that has not been replaced with real content.
+  extracted_at: '2026-08-14'
+  verbatim_placeholders_observed:
+    - 'Feature 5'
+    - 'Feature 4'
+    - 'Feature 3'
+    - 'Improvement 1'
+    - 'Improvement 2'
+    - 'Improvement 3'
+    - 'Product fix 1'
+    - 'Product fix 2'
+    - 'Plan tag'
+  real_content_observed:
+    - >-
+      One genuine product signal appears in the page banner: "You're invited to the 2026 Stotles
+      Summer Release. See what gives public sector suppliers a real edge." That is a marketing
+      announcement, not a changelog entry.
+
+entries: []
+
+api_changelog:
+  exists: false
+  searched:
+    - {url: 'https://www.stotles.com/changelog', status: 200, result: 'product changelog template, no API content'}
+    - {url: 'https://api.stotles.com/v1/openapi.json', status: 200, result: 'info.version "1.0", undated; no version history'}
+    - {url: 'https://help.stotles.com/', status: 200, result: 'help centre has no API or developer category'}
+  note: >-
+    Nothing tracks changes to the API contract. Because the spec declares only info.version "1.0"
+    with no release date, a consumer holding an old capture cannot tell whether the contract has
+    moved. The verbatim capture in this repo (openapi/_original/stotles-public-api-openapi.json,
+    2026-08-14) is the baseline for future diffs.
+
+pointer_policy: >-
+  NO `ChangeLog` pointer is emitted in apis.yml. The page is served by the provider but records zero
+  real entries; wiring a pointer would credit Stotles with a release-communication practice it does
+  not currently have. Re-check on the next round — if the template is filled in, emit the pointer
+  and populate entries[] here.
