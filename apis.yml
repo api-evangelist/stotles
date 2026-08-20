@@ -60,6 +60,24 @@ tags:
 - Sales Intelligence
 - B2G
 - Market Intelligence
+- OpenAPI
+- MCP
+- agent-native
+- Contract Awards
+- Framework Agreements
+- CPV
+- United Kingdom
+- Ireland
+- GovTech
+tags_raw:
+- Company
+- Procurement
+- Public Sector
+- Government
+- Tenders
+- Sales Intelligence
+- B2G
+- Market Intelligence
 - API
 - OpenAPI
 - MCP
@@ -85,6 +103,21 @@ apis:
   humanURL: https://www.stotles.com/integrations
   baseURL: https://api.stotles.com/v1
   tags:
+  - Procurement
+  - Public Sector
+  - Government
+  - Tenders
+  - Contract Awards
+  - Framework Agreements
+  - Market Intelligence
+  - Sales Intelligence
+  - B2G
+  - United Kingdom
+  - Ireland
+  - CPV
+  - OpenAPI
+  - REST
+  tags_raw:
   - procurement
   - public-sector
   - government
@@ -134,6 +167,14 @@ apis:
   humanURL: https://www.stotles.com/integrations
   baseURL: https://api.stotles.com/mcp
   tags:
+  - MCP
+  - agent-native
+  - Procurement
+  - Public Sector
+  - Market Intelligence
+  - B2G
+  - United Kingdom
+  tags_raw:
   - mcp
   - agent-native
   - procurement
