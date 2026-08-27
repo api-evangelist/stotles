@@ -89,81 +89,13 @@ tags_raw:
 - Ireland
 - GovTech
 apis:
-- name: Stotles Public API
-  description: >-
-    REST API giving programmatic access to UK and Ireland public sector procurement data — notices,
-    buyers, suppliers and framework agreements — as JSON over HTTPS. Eight read-only operations
-    across four resources, each with a cursor-paginated /search and a by-UUID lookup. Notices carry
-    the full procurement lifecycle (forward-plan pipeline through open tender to awarded and expired
-    contract) with lots, contracts, awarded suppliers, CPV classification codes and estimated
-    values. Filterable by keyword, CPV code, buyer, supplier, framework, stage, value band and four
-    independent date ranges. Authenticated with a static x-api-key header issued by a Stotles
-    Customer Success Manager. RFC 9457 problem+json errors, opaque-cursor pagination, and a
-    published additive-only versioning contract.
-  humanURL: https://www.stotles.com/integrations
-  baseURL: https://api.stotles.com/v1
-  tags:
-  - Procurement
-  - Public Sector
-  - Government
-  - Tenders
-  - Contract Awards
-  - Framework Agreements
-  - Market Intelligence
-  - Sales Intelligence
-  - B2G
-  - United Kingdom
-  - Ireland
-  - CPV
-  - OpenAPI
-  - REST
-  tags_raw:
-  - procurement
-  - public-sector
-  - government
-  - tenders
-  - contract-awards
-  - framework-agreements
-  - market-intelligence
-  - sales-intelligence
-  - b2g
-  - united-kingdom
-  - ireland
-  - cpv
-  - openapi
-  - rest
-  properties:
-  - type: OpenAPI
-    url: openapi/stotles-public-api-openapi.yml
-  - type: Documentation
-    url: https://api.stotles.com/v1/openapi.json
-  - type: APIReference
-    url: https://api.stotles.com/v1/openapi.json
-  - type: Overlay
-    url: overlays/stotles-public-api-overlay.yaml
-  - type: Authentication
-    url: authentication/stotles-authentication.yml
-  - type: Conventions
-    url: conventions/stotles-conventions.yml
-  - type: ErrorCatalog
-    url: errors/stotles-problem-types.yml
-  - type: DataModel
-    url: data-model/stotles-data-model.yml
-  - type: RateLimits
-    url: rate-limits/stotles-rate-limits.yml
-  - type: Lifecycle
-    url: lifecycle/stotles-lifecycle.yml
-  - type: Deprecation
-    url: lifecycle/stotles-lifecycle.yml
-  - type: AgentSkill
-    url: skills/_index.yml
 - name: Stotles MCP Server
   description: >-
-    Hosted, remote Model Context Protocol server exposing Stotles public sector market data to AI
-    chat tools and agents. Streamable-HTTP transport at api.stotles.com/mcp, authenticated with the
-    same x-api-key header as the REST API. Described by Stotles as letting teams "explore the market
-    in natural language and pull the insights they need without leaving their tools". In beta behind
-    a public waitlist; tools/list is auth-gated, so the live tool schemas require an issued key.
+    Hosted, remote Model Context Protocol server exposing Stotles public sector market data to AI chat
+    tools and agents. Streamable-HTTP transport at api.stotles.com/mcp, authenticated with the same x-api-key
+    header as the REST API. Described by Stotles as letting teams "explore the market in natural language
+    and pull the insights they need without leaving their tools". In beta behind a public waitlist; tools/list
+    is auth-gated, so the live tool schemas require an issued key.
   humanURL: https://www.stotles.com/integrations
   baseURL: https://api.stotles.com/mcp
   tags:
@@ -193,12 +125,128 @@ apis:
     url: https://www.stotles.com/integrations
   - type: Authentication
     url: authentication/stotles-authentication.yml
+- aid: stotles:stotles-buyers-api
+  name: Stotles Buyers API
+  description: Public sector buyers and their procurement activity.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/v1
+  tags:
+  - Buyers
+  properties:
+  - type: OpenAPI
+    url: openapi/stotles-buyers-api-openapi.yml
+  - type: Documentation
+    url: https://api.stotles.com/v1/openapi.json
+  - type: APIReference
+    url: https://api.stotles.com/v1/openapi.json
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
+  - type: Conventions
+    url: conventions/stotles-conventions.yml
+  - type: ErrorCatalog
+    url: errors/stotles-problem-types.yml
+  - type: DataModel
+    url: data-model/stotles-data-model.yml
+  - type: RateLimits
+    url: rate-limits/stotles-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/stotles-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/stotles-lifecycle.yml
+- aid: stotles:stotles-frameworks-api
+  name: Stotles Frameworks API
+  description: Framework agreements and dynamic purchasing systems.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/v1
+  tags:
+  - Frameworks
+  properties:
+  - type: OpenAPI
+    url: openapi/stotles-frameworks-api-openapi.yml
+  - type: Documentation
+    url: https://api.stotles.com/v1/openapi.json
+  - type: APIReference
+    url: https://api.stotles.com/v1/openapi.json
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
+  - type: Conventions
+    url: conventions/stotles-conventions.yml
+  - type: ErrorCatalog
+    url: errors/stotles-problem-types.yml
+  - type: DataModel
+    url: data-model/stotles-data-model.yml
+  - type: RateLimits
+    url: rate-limits/stotles-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/stotles-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/stotles-lifecycle.yml
+- aid: stotles:stotles-notices-api
+  name: Stotles Notices API
+  description: Public sector procurement notices.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/v1
+  tags:
+  - Notices
+  properties:
+  - type: OpenAPI
+    url: openapi/stotles-notices-api-openapi.yml
+  - type: Documentation
+    url: https://api.stotles.com/v1/openapi.json
+  - type: APIReference
+    url: https://api.stotles.com/v1/openapi.json
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
+  - type: Conventions
+    url: conventions/stotles-conventions.yml
+  - type: ErrorCatalog
+    url: errors/stotles-problem-types.yml
+  - type: DataModel
+    url: data-model/stotles-data-model.yml
+  - type: RateLimits
+    url: rate-limits/stotles-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/stotles-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/stotles-lifecycle.yml
+- aid: stotles:stotles-suppliers-api
+  name: Stotles Suppliers API
+  description: Suppliers bidding for and winning public sector contracts.
+  humanURL: https://www.stotles.com/integrations
+  baseURL: https://api.stotles.com/v1
+  tags:
+  - Suppliers
+  properties:
+  - type: OpenAPI
+    url: openapi/stotles-suppliers-api-openapi.yml
+  - type: Documentation
+    url: https://api.stotles.com/v1/openapi.json
+  - type: APIReference
+    url: https://api.stotles.com/v1/openapi.json
+  - type: Authentication
+    url: authentication/stotles-authentication.yml
+  - type: Conventions
+    url: conventions/stotles-conventions.yml
+  - type: ErrorCatalog
+    url: errors/stotles-problem-types.yml
+  - type: DataModel
+    url: data-model/stotles-data-model.yml
+  - type: RateLimits
+    url: rate-limits/stotles-rate-limits.yml
+  - type: Lifecycle
+    url: lifecycle/stotles-lifecycle.yml
+  - type: Deprecation
+    url: lifecycle/stotles-lifecycle.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Overlay
+  url: overlays/stotles-public-api-overlay.yaml
+- type: AgentSkill
+  url: skills/_index.yml
 - type: Website
   url: https://www.stotles.com
 - type: Documentation
