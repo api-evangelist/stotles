@@ -1,0 +1,560 @@
+openapi: 3.2.0
+info:
+  title: Stotles Public Buyers API
+  description: "The Stotles Public API gives you programmatic access to UK public sector procurement\ndata — notices, buyers, suppliers and framework agreements — as JSON over HTTPS.\n\n## Base URL\n\nAll endpoints live under a versioned path:\n\n```\nhttps://api.stotles.com/v1\n```\n\n## Authentication\n\nEvery request needs an API key, sent in the `x-api-key` header:\n\n```bash\ncurl -G https://api.stotles.com/v1/notices/search \\\n  -H \"x-api-key: $STOTLES_API_KEY\" \\\n  --data-urlencode \"query=cyber security\"\n```\n\nKeys are issued by Stotles — ask your Customer Success Manager. A key identifies\nyour organization, so treat it as a secret: keep it server-side and out of source\ncontrol.\n\nRequests without a valid key get a `401`.\n\n## Rate limits\n\nEach API key may make **1,000 requests per hour**, and no more than\n**3 requests per second**. Both apply at once, so a burst of parallel\nrequests can be throttled well inside your hourly allowance.\n\nOver either limit you get a `429` carrying a `Retry-After` header — the number of\nseconds to wait. Honour it and retry; a client that retries immediately will keep\ngetting `429`s. If these limits don't fit your use case, talk to your Customer\nSuccess Manager.\n\n## Pagination\n\nList endpoints (`/search`) return an `items` array plus a top-level\n`next_cursor`:\n\n```json\n{ \"items\": [ … ], \"next_cursor\": \"eyJwYWdlIjoyLCJsaW1pdCI6MjB9\" }\n```\n\nTo read the next page, pass that value back as `?cursor=…`. Keep going until\n`next_cursor` is `null`, which means you have reached the last page.\n\nTwo things to get right:\n\n- **A short page is not the last page.** A page can contain fewer than `limit`\n  items and still have more results behind it. Only `next_cursor: null` ends the\n  loop.\n- **Cursors are opaque.** Pass them back byte-for-byte. Don't decode, construct or\n  persist them — the encoding is an implementation detail and may change.\n\n## Errors\n\nErrors use [RFC 9457 problem details](https://www.rfc-editor.org/rfc/rfc9457) with\nthe `application/problem+json` content type:\n\n```json\n{\n  \"type\": \"https://api.stotles.com/problems/validation\",\n  \"title\": \"Request validation failed\",\n  \"status\": 400,\n  \"detail\": \"The request parameters failed validation. See the 'errors' array for details.\",\n  \"errors\": [{ \"parameter\": \"limit\", \"detail\": \"Too big: expected number to be <=50\" }]\n}\n```\n\n- **Branch on `type`**, not on `title` or `detail` — `type` is a stable\n  identifier per error category; the human-readable fields may be reworded.\n- On validation failures, `errors[]` locates each problem: `parameter` for a\n  query or path parameter, `pointer` for a request body field, `header` for a\n  header.\n\n## Conventions\n\n- **Field names and query parameters are `snake_case`.**\n- **Identifiers are UUIDs.** The `id` a resource returns is the same `id` you\n  filter by (`buyer_id`, `supplier_id`, `framework_id`).\n- **Dates are calendar dates**, `YYYY-MM-DD`, never timestamps. There is no\n  meaningful empty date, so an unknown date is `null`.\n- **Money is a decimal amount plus a currency** — `{ \"amount\": 4500000, \"currency\": \"GBP\" }`\n  — not integer minor units. Amounts can be large and are estimates, so parse them\n  with a big-decimal type rather than a float. `currency` can be `null` when the\n  source didn't state one.\n- **Country codes are ISO 3166-1 alpha-2** (`GB`, `IE`).\n- **Multi-value filters repeat the parameter**: `?stage=open_tender&stage=closed_tender`\n  matches either. Don't comma-join values.\n- **Range filters carry an explicit operator suffix** — `publish_date_gte`,\n  `value_lte`. Both bounds are inclusive.\n- **Unknown optional text is an empty string** where blank is meaningful, and\n  `null` where absence is meaningful. Each field's description says which.\n\n## Versioning and stability\n\nThe version is in the path (`/v1`). Within a version we make only additive\nchanges — new endpoints, new optional parameters, new response fields — so **write\nclients that ignore fields they don't recognize**. Anything breaking (removing or\nrenaming a field, changing a type, tightening validation) goes in a new version,\nand we will contact you before retiring one.\n\n## Support\n\nFor questions, bug reports, or requests for data we don't expose yet, contact your\nStotles Customer Success Manager."
+  version: '1.0'
+  contact:
+    name: Stotles API Support
+    url: https://www.stotles.com
+servers:
+- url: https://api.stotles.com
+  description: Production
+security:
+- apiKey: []
+tags:
+- name: Buyers
+  description: Public sector buyers and their procurement activity.
+paths:
+  /v1/buyers/search:
+    get:
+      description: Find public sector buyers by name, optionally narrowed by country or by where they sit in the buyer-type taxonomy. Each result is the full buyer profile — the same shape as `GET /v1/buyers/{id}`.
+      operationId: searchBuyers
+      parameters:
+      - name: query
+        required: true
+        in: query
+        description: Free-text search over the buyer name (2–200 characters).
+        schema:
+          minLength: 2
+          maxLength: 200
+          type: string
+      - name: country_code
+        required: false
+        in: query
+        description: Filter to buyers in these ISO 3166-1 alpha-2 countries. Repeatable.
+        schema:
+          maxItems: 100
+          type: array
+          items:
+            type: string
+            pattern: ^[A-Za-z]{2}$
+        style: form
+        explode: true
+      - name: type
+        required: false
+        in: query
+        description: Filter to buyers of these types. Repeatable.
+        schema:
+          maxItems: 23
+          type: array
+          items:
+            type: string
+            enum:
+            - ministerial_department
+            - non_ministerial_department
+            - agencies_and_non_departmental_bodies
+            - other_central
+            - devolved_department
+            - local_authority
+            - purchasing_organization
+            - parish_council
+            - other_local_organization
+            - central_healthcare_organizations
+            - nhs_trusts
+            - nhs_ccg_stp_ics
+            - other_healthcare
+            - police
+            - fire
+            - ambulance
+            - other_blue_light
+            - schools
+            - higher_and_further_education
+            - other_education
+            - housing_associations
+            - other_public_sector
+            - utilities
+        style: form
+        explode: true
+      - name: type_group
+        required: false
+        in: query
+        description: Filter to buyers in these type groups — matches any type within a group. Repeatable.
+        schema:
+          maxItems: 6
+          type: array
+          items:
+            type: string
+            enum:
+            - central
+            - local
+            - healthcare
+            - blue_light
+            - education
+            - other
+        style: form
+        explode: true
+      - name: limit
+        required: false
+        in: query
+        description: Maximum results per page (1–50, default 20). Ignored when `cursor` is set.
+        schema:
+          minimum: 1
+          maximum: 50
+          default: 20
+          type: integer
+      - name: cursor
+        required: false
+        in: query
+        description: Opaque pagination cursor from a previous response's `next_cursor`. Carries the page and page size, so `limit` is ignored when it is present.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A page of matching buyers.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerSearchResponseDto'
+              example:
+                items:
+                - id: 3c6e0b8a-9c15-4f2d-8b7a-2e5d1c9f4a60
+                  name: Department for Work and Pensions
+                  location:
+                    country_code: GB
+                    locality: London
+                  employee_count_band: 20000+
+                  website_url: https://www.gov.uk/government/organisations/department-for-work-pensions
+                  types:
+                  - id: ministerial_department
+                    name: Ministerial department
+                    group:
+                      id: central
+                      name: Central government
+                - id: 5a1f2c7d-4b8e-4c1a-9f3d-6e2b8a4c7d19
+                  name: Leeds City Council
+                  location:
+                    country_code: GB
+                    locality: Leeds
+                  employee_count_band: 10000-19999
+                  website_url: https://www.leeds.gov.uk
+                  types:
+                  - id: local_authority
+                    name: Local authority
+                    group:
+                      id: local
+                      name: Local government
+                next_cursor: eyJwYWdlIjoyLCJsaW1pdCI6MjB9
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Search buyers by name
+      tags:
+      - Buyers
+      x-codeSamples:
+      - lang: cURL
+        label: curl
+        source: "curl -G https://api.stotles.com/v1/buyers/search \\\n  -H \"x-api-key: $STOTLES_API_KEY\" \\\n  --data-urlencode \"query=city council\" \\\n  -d \"type_group=local\" \\\n  -d \"country_code=GB\""
+  /v1/buyers/{id}:
+    get:
+      description: Fetch a single buyer, including its location and what kind of public sector body it is. Use the `id` as the `buyer_id` filter on notice search to see what it has been procuring.
+      operationId: getBuyer
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: The buyer's unique identifier.
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          description: The buyer.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuyerResponseDto'
+              example:
+                id: 3c6e0b8a-9c15-4f2d-8b7a-2e5d1c9f4a60
+                name: Department for Work and Pensions
+                location:
+                  country_code: GB
+                  locality: London
+                employee_count_band: 20000+
+                website_url: https://www.gov.uk/government/organisations/department-for-work-pensions
+                types:
+                - id: ministerial_department
+                  name: Ministerial department
+                  group:
+                    id: central
+                    name: Central government
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      summary: Get a buyer by id
+      tags:
+      - Buyers
+      x-codeSamples:
+      - lang: cURL
+        label: curl
+        source: "curl https://api.stotles.com/v1/buyers/3c6e0b8a-9c15-4f2d-8b7a-2e5d1c9f4a60 \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
+components:
+  responses:
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
+    ValidationError:
+      description: The request failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    RateLimited:
+      description: The client has sent too many requests in a given amount of time.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/rate-limited
+            title: Too many requests
+            status: 429
+            detail: Rate limit exceeded. Retry later.
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
+  schemas:
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Stable category identifier — clients branch on this.
+          format: uri
+        title:
+          type: string
+          description: Short, human-readable summary of the category. Stable per `type`.
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+          description: HTTP status code, duplicated in the body so the payload is self-contained.
+        detail:
+          description: Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
+          type: string
+        errors:
+          description: Per-field validation failures; present only on validation (400) problems.
+          type: array
+          items:
+            anyOf:
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                pointer:
+                  type: string
+              required:
+              - detail
+              - pointer
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                parameter:
+                  type: string
+              required:
+              - detail
+              - parameter
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                header:
+                  type: string
+              required:
+              - detail
+              - header
+              additionalProperties: false
+      required:
+      - type
+      - title
+      - status
+      additionalProperties: true
+    BuyerResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The buyer's unique identifier.
+        name:
+          type: string
+          description: The buyer's name.
+        location:
+          type: object
+          properties:
+            country_code:
+              type: string
+              description: ISO 3166-1 alpha-2 country code; empty string when unknown.
+            locality:
+              type:
+              - string
+              - 'null'
+              description: The town or city (e.g. "London"); null when unknown.
+          required:
+          - country_code
+          - locality
+          description: The buyer's location.
+        employee_count_band:
+          type:
+          - string
+          - 'null'
+          description: Employee-count band (e.g. "20000+"); null when unknown.
+        website_url:
+          type:
+          - string
+          - 'null'
+          description: The buyer's website URL; null when unknown.
+        types:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                enum:
+                - ministerial_department
+                - non_ministerial_department
+                - agencies_and_non_departmental_bodies
+                - other_central
+                - devolved_department
+                - local_authority
+                - purchasing_organization
+                - parish_council
+                - other_local_organization
+                - central_healthcare_organizations
+                - nhs_trusts
+                - nhs_ccg_stp_ics
+                - other_healthcare
+                - police
+                - fire
+                - ambulance
+                - other_blue_light
+                - schools
+                - higher_and_further_education
+                - other_education
+                - housing_associations
+                - other_public_sector
+                - utilities
+                description: Stable identifier for the buyer type.
+              name:
+                type: string
+                description: Human-readable label for the buyer type.
+              group:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    enum:
+                    - central
+                    - local
+                    - healthcare
+                    - blue_light
+                    - education
+                    - other
+                    description: Stable identifier for the group.
+                  name:
+                    type: string
+                    description: Human-readable label for the group.
+                required:
+                - id
+                - name
+                description: The top-level group this type belongs to.
+            required:
+            - id
+            - name
+            - group
+          description: What kind of public sector body this buyer is. Empty when the buyer has no recognized type. Most identifiers read plainly; the one acronym is `nhs_ccg_stp_ics` — NHS Clinical Commissioning Group / Sustainability and Transformation Partnership / Integrated Care System.
+      required:
+      - id
+      - name
+      - location
+      - employee_count_band
+      - website_url
+      - types
+    BuyerSearchResponseDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The buyer's unique identifier.
+              name:
+                type: string
+                description: The buyer's name.
+              location:
+                type: object
+                properties:
+                  country_code:
+                    type: string
+                    description: ISO 3166-1 alpha-2 country code; empty string when unknown.
+                  locality:
+                    type:
+                    - string
+                    - 'null'
+                    description: The town or city (e.g. "London"); null when unknown.
+                required:
+                - country_code
+                - locality
+                description: The buyer's location.
+              employee_count_band:
+                type:
+                - string
+                - 'null'
+                description: Employee-count band (e.g. "20000+"); null when unknown.
+              website_url:
+                type:
+                - string
+                - 'null'
+                description: The buyer's website URL; null when unknown.
+              types:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      enum:
+                      - ministerial_department
+                      - non_ministerial_department
+                      - agencies_and_non_departmental_bodies
+                      - other_central
+                      - devolved_department
+                      - local_authority
+                      - purchasing_organization
+                      - parish_council
+                      - other_local_organization
+                      - central_healthcare_organizations
+                      - nhs_trusts
+                      - nhs_ccg_stp_ics
+                      - other_healthcare
+                      - police
+                      - fire
+                      - ambulance
+                      - other_blue_light
+                      - schools
+                      - higher_and_further_education
+                      - other_education
+                      - housing_associations
+                      - other_public_sector
+                      - utilities
+                      description: Stable identifier for the buyer type.
+                    name:
+                      type: string
+                      description: Human-readable label for the buyer type.
+                    group:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          enum:
+                          - central
+                          - local
+                          - healthcare
+                          - blue_light
+                          - education
+                          - other
+                          description: Stable identifier for the group.
+                        name:
+                          type: string
+                          description: Human-readable label for the group.
+                      required:
+                      - id
+                      - name
+                      description: The top-level group this type belongs to.
+                  required:
+                  - id
+                  - name
+                  - group
+                description: What kind of public sector body this buyer is. Empty when the buyer has no recognized type. Most identifiers read plainly; the one acronym is `nhs_ccg_stp_ics` — NHS Clinical Commissioning Group / Sustainability and Transformation Partnership / Integrated Care System.
+            required:
+            - id
+            - name
+            - location
+            - employee_count_band
+            - website_url
+            - types
+          description: The matching buyers, most relevant first.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page of results; null when this is the last page.
+      required:
+      - items
+      - next_cursor
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
