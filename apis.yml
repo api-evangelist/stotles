@@ -74,7 +74,7 @@ tags:
 - Market Intelligence
 - OpenAPI
 - MCP
-- agent-native
+- Agent Native
 - Contract Awards
 - Framework Agreements
 - CPV
@@ -114,10 +114,10 @@ apis:
   - MCP
   - agent-native
   - Procurement
-  - Public Sector
+  - public-sector
   - Market Intelligence
-  - B2G
-  - United Kingdom
+  - b2g
+  - united-kingdom
   tags_raw:
   - mcp
   - agent-native
