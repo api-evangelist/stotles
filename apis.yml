@@ -172,6 +172,8 @@ apis:
   humanURL: https://www.stotles.com/integrations
   baseURL: https://api.stotles.com/v1
   tags:
+  - Framework
+  tags_raw:
   - Frameworks
   properties:
   - type: OpenAPI
