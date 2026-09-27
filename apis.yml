@@ -74,7 +74,7 @@ tags:
 - Market Intelligence
 - OpenAPI
 - MCP
-- agent-native
+- Agent-Native
 - Contract Awards
 - Framework Agreements
 - CPV
@@ -100,6 +100,7 @@ tags_raw:
 - United Kingdom
 - Ireland
 - GovTech
+- agent-native
 apis:
 - name: Stotles MCP Server
   description: >-
@@ -112,7 +113,7 @@ apis:
   baseURL: https://api.stotles.com/mcp
   tags:
   - MCP
-  - agent-native
+  - Agent-Native
   - Procurement
   - Public Sector
   - Market Intelligence

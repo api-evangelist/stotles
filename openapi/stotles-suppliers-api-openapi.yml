@@ -135,7 +135,111 @@ paths:
         label: curl
         source: "curl https://api.stotles.com/v1/suppliers/b2d4f6a8-1c3e-4d5f-8a9b-0c1d2e3f4a5b \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
+  responses:
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
+    ValidationError:
+      description: The request failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
+    RateLimited:
+      description: The client has sent too many requests in a given amount of time.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/rate-limited
+            title: Too many requests
+            status: 429
+            detail: Rate limit exceeded. Retry later.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
   schemas:
+    SupplierSearchResponseDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The supplier's unique identifier.
+              name:
+                type: string
+                description: The supplier's name.
+              location:
+                type: object
+                properties:
+                  country_code:
+                    type: string
+                    description: ISO 3166-1 alpha-2 country code.
+                required:
+                - country_code
+                description: The supplier's location.
+              award_count:
+                type: integer
+                description: All-time count of contracts awarded to this supplier.
+            required:
+            - id
+            - name
+            - location
+            - award_count
+          description: The matching suppliers, most relevant first.
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque cursor for the next page of results; null when this is the last page.
+      required:
+      - items
+      - next_cursor
     ProblemDetails:
       type: object
       properties:
@@ -224,110 +328,6 @@ components:
       - name
       - location
       - award_count
-    SupplierSearchResponseDto:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                format: uuid
-                description: The supplier's unique identifier.
-              name:
-                type: string
-                description: The supplier's name.
-              location:
-                type: object
-                properties:
-                  country_code:
-                    type: string
-                    description: ISO 3166-1 alpha-2 country code.
-                required:
-                - country_code
-                description: The supplier's location.
-              award_count:
-                type: integer
-                description: All-time count of contracts awarded to this supplier.
-            required:
-            - id
-            - name
-            - location
-            - award_count
-          description: The matching suppliers, most relevant first.
-        next_cursor:
-          type:
-          - string
-          - 'null'
-          description: Opaque cursor for the next page of results; null when this is the last page.
-      required:
-      - items
-      - next_cursor
-  responses:
-    InternalError:
-      description: An unexpected error occurred.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
-    RateLimited:
-      description: The client has sent too many requests in a given amount of time.
-      headers:
-        Retry-After:
-          description: Seconds to wait before retrying.
-          schema:
-            type: integer
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/rate-limited
-            title: Too many requests
-            status: 429
-            detail: Rate limit exceeded. Retry later.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
-    NotFound:
-      description: The requested resource does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/not-found
-            title: Not found
-            status: 404
-            detail: No notice exists with the given id.
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
   securitySchemes:
     apiKey:
       type: apiKey

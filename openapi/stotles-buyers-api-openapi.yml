@@ -212,170 +212,70 @@ paths:
         label: curl
         source: "curl https://api.stotles.com/v1/buyers/3c6e0b8a-9c15-4f2d-8b7a-2e5d1c9f4a60 \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
+  responses:
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
+    ValidationError:
+      description: The request failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
+    RateLimited:
+      description: The client has sent too many requests in a given amount of time.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/rate-limited
+            title: Too many requests
+            status: 429
+            detail: Rate limit exceeded. Retry later.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
   schemas:
-    ProblemDetails:
-      type: object
-      properties:
-        type:
-          type: string
-          description: Stable category identifier — clients branch on this.
-          format: uri
-        title:
-          type: string
-          description: Short, human-readable summary of the category. Stable per `type`.
-        status:
-          type: integer
-          minimum: 100
-          maximum: 599
-          description: HTTP status code, duplicated in the body so the payload is self-contained.
-        detail:
-          description: Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
-          type: string
-        errors:
-          description: Per-field validation failures; present only on validation (400) problems.
-          type: array
-          items:
-            anyOf:
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                pointer:
-                  type: string
-              required:
-              - detail
-              - pointer
-              additionalProperties: false
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                parameter:
-                  type: string
-              required:
-              - detail
-              - parameter
-              additionalProperties: false
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                header:
-                  type: string
-              required:
-              - detail
-              - header
-              additionalProperties: false
-      required:
-      - type
-      - title
-      - status
-      additionalProperties: true
-    BuyerResponseDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The buyer's unique identifier.
-        name:
-          type: string
-          description: The buyer's name.
-        location:
-          type: object
-          properties:
-            country_code:
-              type: string
-              description: ISO 3166-1 alpha-2 country code; empty string when unknown.
-            locality:
-              type:
-              - string
-              - 'null'
-              description: The town or city (e.g. "London"); null when unknown.
-          required:
-          - country_code
-          - locality
-          description: The buyer's location.
-        employee_count_band:
-          type:
-          - string
-          - 'null'
-          description: Employee-count band (e.g. "20000+"); null when unknown.
-        website_url:
-          type:
-          - string
-          - 'null'
-          description: The buyer's website URL; null when unknown.
-        types:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                enum:
-                - ministerial_department
-                - non_ministerial_department
-                - agencies_and_non_departmental_bodies
-                - other_central
-                - devolved_department
-                - local_authority
-                - purchasing_organization
-                - parish_council
-                - other_local_organization
-                - central_healthcare_organizations
-                - nhs_trusts
-                - nhs_ccg_stp_ics
-                - other_healthcare
-                - police
-                - fire
-                - ambulance
-                - other_blue_light
-                - schools
-                - higher_and_further_education
-                - other_education
-                - housing_associations
-                - other_public_sector
-                - utilities
-                description: Stable identifier for the buyer type.
-              name:
-                type: string
-                description: Human-readable label for the buyer type.
-              group:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    enum:
-                    - central
-                    - local
-                    - healthcare
-                    - blue_light
-                    - education
-                    - other
-                    description: Stable identifier for the group.
-                  name:
-                    type: string
-                    description: Human-readable label for the group.
-                required:
-                - id
-                - name
-                description: The top-level group this type belongs to.
-            required:
-            - id
-            - name
-            - group
-          description: What kind of public sector body this buyer is. Empty when the buyer has no recognized type. Most identifiers read plainly; the one acronym is `nhs_ccg_stp_ics` — NHS Clinical Commissioning Group / Sustainability and Transformation Partnership / Integrated Care System.
-      required:
-      - id
-      - name
-      - location
-      - employee_count_band
-      - website_url
-      - types
     BuyerSearchResponseDto:
       type: object
       properties:
@@ -492,69 +392,169 @@ components:
       required:
       - items
       - next_cursor
-  responses:
-    InternalError:
-      description: An unexpected error occurred.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
-    RateLimited:
-      description: The client has sent too many requests in a given amount of time.
-      headers:
-        Retry-After:
-          description: Seconds to wait before retrying.
-          schema:
-            type: integer
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/rate-limited
-            title: Too many requests
-            status: 429
-            detail: Rate limit exceeded. Retry later.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
-    NotFound:
-      description: The requested resource does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/not-found
-            title: Not found
-            status: 404
-            detail: No notice exists with the given id.
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
+    BuyerResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The buyer's unique identifier.
+        name:
+          type: string
+          description: The buyer's name.
+        location:
+          type: object
+          properties:
+            country_code:
+              type: string
+              description: ISO 3166-1 alpha-2 country code; empty string when unknown.
+            locality:
+              type:
+              - string
+              - 'null'
+              description: The town or city (e.g. "London"); null when unknown.
+          required:
+          - country_code
+          - locality
+          description: The buyer's location.
+        employee_count_band:
+          type:
+          - string
+          - 'null'
+          description: Employee-count band (e.g. "20000+"); null when unknown.
+        website_url:
+          type:
+          - string
+          - 'null'
+          description: The buyer's website URL; null when unknown.
+        types:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                enum:
+                - ministerial_department
+                - non_ministerial_department
+                - agencies_and_non_departmental_bodies
+                - other_central
+                - devolved_department
+                - local_authority
+                - purchasing_organization
+                - parish_council
+                - other_local_organization
+                - central_healthcare_organizations
+                - nhs_trusts
+                - nhs_ccg_stp_ics
+                - other_healthcare
+                - police
+                - fire
+                - ambulance
+                - other_blue_light
+                - schools
+                - higher_and_further_education
+                - other_education
+                - housing_associations
+                - other_public_sector
+                - utilities
+                description: Stable identifier for the buyer type.
+              name:
+                type: string
+                description: Human-readable label for the buyer type.
+              group:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    enum:
+                    - central
+                    - local
+                    - healthcare
+                    - blue_light
+                    - education
+                    - other
+                    description: Stable identifier for the group.
+                  name:
+                    type: string
+                    description: Human-readable label for the group.
+                required:
+                - id
+                - name
+                description: The top-level group this type belongs to.
+            required:
+            - id
+            - name
+            - group
+          description: What kind of public sector body this buyer is. Empty when the buyer has no recognized type. Most identifiers read plainly; the one acronym is `nhs_ccg_stp_ics` — NHS Clinical Commissioning Group / Sustainability and Transformation Partnership / Integrated Care System.
+      required:
+      - id
+      - name
+      - location
+      - employee_count_band
+      - website_url
+      - types
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Stable category identifier — clients branch on this.
+          format: uri
+        title:
+          type: string
+          description: Short, human-readable summary of the category. Stable per `type`.
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+          description: HTTP status code, duplicated in the body so the payload is self-contained.
+        detail:
+          description: Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
+          type: string
+        errors:
+          description: Per-field validation failures; present only on validation (400) problems.
+          type: array
+          items:
+            anyOf:
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                pointer:
+                  type: string
+              required:
+              - detail
+              - pointer
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                parameter:
+                  type: string
+              required:
+              - detail
+              - parameter
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                header:
+                  type: string
+              required:
+              - detail
+              - header
+              additionalProperties: false
+      required:
+      - type
+      - title
+      - status
+      additionalProperties: true
   securitySchemes:
     apiKey:
       type: apiKey

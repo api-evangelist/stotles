@@ -213,7 +213,168 @@ paths:
         label: curl
         source: "curl https://api.stotles.com/v1/frameworks/7d9b1f3a-5c2e-4a8b-9d0f-3e6c1a4b7d92 \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
+  responses:
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
+    ValidationError:
+      description: The request failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
+    RateLimited:
+      description: The client has sent too many requests in a given amount of time.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/rate-limited
+            title: Too many requests
+            status: 429
+            detail: Rate limit exceeded. Retry later.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
   schemas:
+    FrameworkResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The framework's unique identifier.
+        title:
+          type: string
+          description: The framework's title.
+        description:
+          type: string
+          description: The framework's description; empty when unknown.
+        service_provider:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The provider organisation's unique identifier.
+            name:
+              type: string
+              description: The provider organisation's name.
+          required:
+          - id
+          - name
+          description: The framework's service provider organization; null when unknown.
+        stage:
+          type: string
+          enum:
+          - stale
+          - upcoming
+          - tendering
+          - closed
+          - awarded
+          - live
+          - expired
+          - canceled
+          description: The framework's procurement stage.
+          x-enumDescriptions:
+            stale: Announced, but aged past the point where tendering would normally have started. Treat it as unlikely to progress.
+            upcoming: Announced or planned. Suppliers cannot apply yet.
+            tendering: Open for suppliers to apply to be appointed to the framework.
+            closed: The application deadline has passed; the buyer has not yet announced which suppliers were appointed.
+            awarded: Suppliers have been appointed, but the agreement isn't available to buy from yet (typically its start date is in the future).
+            live: In force — buyers can run call-offs against it, and appointed suppliers can win work.
+            expired: Past its end date. No new call-offs are expected.
+            canceled: Withdrawn or abandoned before it came into force.
+        procedure_type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - framework
+          - dynamic_purchasing_system
+          - null
+          description: Whether this is a framework agreement or a dynamic purchasing system; null when unknown.
+        value:
+          type:
+          - object
+          - 'null'
+          properties:
+            amount:
+              type: number
+              description: The amount as a JSON number, byte-aligned with the upstream feed. Parse with a big-decimal library — do not rely on IEEE-754 float arithmetic.
+            currency:
+              type:
+              - string
+              - 'null'
+              description: ISO 4217 currency code (e.g. GBP). Null when the source didn't specify one.
+          required:
+          - amount
+          - currency
+          description: Estimated total value of the framework; null when no amount is known.
+        start_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Contract start date (YYYY-MM-DD); null when unknown.
+        end_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Contract end date (YYYY-MM-DD); null when unknown.
+      required:
+      - id
+      - title
+      - description
+      - service_provider
+      - stage
+      - procedure_type
+      - value
+      - start_date
+      - end_date
     ProblemDetails:
       type: object
       properties:
@@ -387,167 +548,6 @@ components:
       required:
       - items
       - next_cursor
-    FrameworkResponseDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: The framework's unique identifier.
-        title:
-          type: string
-          description: The framework's title.
-        description:
-          type: string
-          description: The framework's description; empty when unknown.
-        service_provider:
-          type:
-          - object
-          - 'null'
-          properties:
-            id:
-              type: string
-              format: uuid
-              description: The provider organisation's unique identifier.
-            name:
-              type: string
-              description: The provider organisation's name.
-          required:
-          - id
-          - name
-          description: The framework's service provider organization; null when unknown.
-        stage:
-          type: string
-          enum:
-          - stale
-          - upcoming
-          - tendering
-          - closed
-          - awarded
-          - live
-          - expired
-          - canceled
-          description: The framework's procurement stage.
-          x-enumDescriptions:
-            stale: Announced, but aged past the point where tendering would normally have started. Treat it as unlikely to progress.
-            upcoming: Announced or planned. Suppliers cannot apply yet.
-            tendering: Open for suppliers to apply to be appointed to the framework.
-            closed: The application deadline has passed; the buyer has not yet announced which suppliers were appointed.
-            awarded: Suppliers have been appointed, but the agreement isn't available to buy from yet (typically its start date is in the future).
-            live: In force — buyers can run call-offs against it, and appointed suppliers can win work.
-            expired: Past its end date. No new call-offs are expected.
-            canceled: Withdrawn or abandoned before it came into force.
-        procedure_type:
-          type:
-          - string
-          - 'null'
-          enum:
-          - framework
-          - dynamic_purchasing_system
-          - null
-          description: Whether this is a framework agreement or a dynamic purchasing system; null when unknown.
-        value:
-          type:
-          - object
-          - 'null'
-          properties:
-            amount:
-              type: number
-              description: The amount as a JSON number, byte-aligned with the upstream feed. Parse with a big-decimal library — do not rely on IEEE-754 float arithmetic.
-            currency:
-              type:
-              - string
-              - 'null'
-              description: ISO 4217 currency code (e.g. GBP). Null when the source didn't specify one.
-          required:
-          - amount
-          - currency
-          description: Estimated total value of the framework; null when no amount is known.
-        start_date:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Contract start date (YYYY-MM-DD); null when unknown.
-        end_date:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Contract end date (YYYY-MM-DD); null when unknown.
-      required:
-      - id
-      - title
-      - description
-      - service_provider
-      - stage
-      - procedure_type
-      - value
-      - start_date
-      - end_date
-  responses:
-    InternalError:
-      description: An unexpected error occurred.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
-    RateLimited:
-      description: The client has sent too many requests in a given amount of time.
-      headers:
-        Retry-After:
-          description: Seconds to wait before retrying.
-          schema:
-            type: integer
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/rate-limited
-            title: Too many requests
-            status: 429
-            detail: Rate limit exceeded. Retry later.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
-    NotFound:
-      description: The requested resource does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/not-found
-            title: Not found
-            status: 404
-            detail: No notice exists with the given id.
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
   securitySchemes:
     apiKey:
       type: apiKey
