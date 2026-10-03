@@ -426,31 +426,6 @@ paths:
         source: "curl https://api.stotles.com/v1/notices/8f14e45f-ea0d-4a3b-9c2e-1d7b6a5c4e30 \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
   responses:
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
     RateLimited:
       description: The client has sent too many requests in a given amount of time.
       headers:
@@ -467,16 +442,20 @@ components:
             title: Too many requests
             status: 429
             detail: Rate limit exceeded. Retry later.
-    InternalError:
-      description: An unexpected error occurred.
+    ValidationError:
+      description: The request failed validation.
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
           example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
     NotFound:
       description: The requested resource does not exist.
       content:
@@ -488,6 +467,27 @@ components:
             title: Not found
             status: 404
             detail: No notice exists with the given id.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
   schemas:
     NoticeSearchResponseDto:
       type: object
@@ -852,6 +852,67 @@ components:
       required:
       - items
       - next_cursor
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Stable category identifier — clients branch on this.
+          format: uri
+        title:
+          type: string
+          description: Short, human-readable summary of the category. Stable per `type`.
+        status:
+          type: integer
+          minimum: 100
+          maximum: 599
+          description: HTTP status code, duplicated in the body so the payload is self-contained.
+        detail:
+          description: Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
+          type: string
+        errors:
+          description: Per-field validation failures; present only on validation (400) problems.
+          type: array
+          items:
+            anyOf:
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                pointer:
+                  type: string
+              required:
+              - detail
+              - pointer
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                parameter:
+                  type: string
+              required:
+              - detail
+              - parameter
+              additionalProperties: false
+            - type: object
+              properties:
+                detail:
+                  type: string
+                  description: Human-readable description of this field error.
+                header:
+                  type: string
+              required:
+              - detail
+              - header
+              additionalProperties: false
+      required:
+      - type
+      - title
+      - status
+      additionalProperties: true
     NoticeResponseDto:
       type: object
       properties:
@@ -1201,67 +1262,6 @@ components:
       - framework
       - lots
       - contracts
-    ProblemDetails:
-      type: object
-      properties:
-        type:
-          type: string
-          description: Stable category identifier — clients branch on this.
-          format: uri
-        title:
-          type: string
-          description: Short, human-readable summary of the category. Stable per `type`.
-        status:
-          type: integer
-          minimum: 100
-          maximum: 599
-          description: HTTP status code, duplicated in the body so the payload is self-contained.
-        detail:
-          description: Human-readable, occurrence-specific detail. Omitted on 5xx so we never leak internals.
-          type: string
-        errors:
-          description: Per-field validation failures; present only on validation (400) problems.
-          type: array
-          items:
-            anyOf:
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                pointer:
-                  type: string
-              required:
-              - detail
-              - pointer
-              additionalProperties: false
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                parameter:
-                  type: string
-              required:
-              - detail
-              - parameter
-              additionalProperties: false
-            - type: object
-              properties:
-                detail:
-                  type: string
-                  description: Human-readable description of this field error.
-                header:
-                  type: string
-              required:
-              - detail
-              - header
-              additionalProperties: false
-      required:
-      - type
-      - title
-      - status
-      additionalProperties: true
   securitySchemes:
     apiKey:
       type: apiKey

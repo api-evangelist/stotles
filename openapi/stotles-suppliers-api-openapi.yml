@@ -136,31 +136,6 @@ paths:
         source: "curl https://api.stotles.com/v1/suppliers/b2d4f6a8-1c3e-4d5f-8a9b-0c1d2e3f4a5b \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
   responses:
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
     RateLimited:
       description: The client has sent too many requests in a given amount of time.
       headers:
@@ -177,16 +152,20 @@ components:
             title: Too many requests
             status: 429
             detail: Rate limit exceeded. Retry later.
-    InternalError:
-      description: An unexpected error occurred.
+    ValidationError:
+      description: The request failed validation.
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
           example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
     NotFound:
       description: The requested resource does not exist.
       content:
@@ -198,6 +177,27 @@ components:
             title: Not found
             status: 404
             detail: No notice exists with the given id.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
   schemas:
     SupplierSearchResponseDto:
       type: object
