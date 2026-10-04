@@ -426,6 +426,17 @@ paths:
         source: "curl https://api.stotles.com/v1/notices/8f14e45f-ea0d-4a3b-9c2e-1d7b6a5c4e30 \\\n  -H \"x-api-key: $STOTLES_API_KEY\""
 components:
   responses:
+    Unauthenticated:
+      description: Missing or invalid API key.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/unauthenticated
+            title: Unauthenticated
+            status: 401
+            detail: Missing or invalid API key.
     RateLimited:
       description: The client has sent too many requests in a given amount of time.
       headers:
@@ -442,6 +453,27 @@ components:
             title: Too many requests
             status: 429
             detail: Rate limit exceeded. Retry later.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
     ValidationError:
       description: The request failed validation.
       content:
@@ -456,38 +488,6 @@ components:
             errors:
             - parameter: id
               detail: Invalid uuid
-    NotFound:
-      description: The requested resource does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/not-found
-            title: Not found
-            status: 404
-            detail: No notice exists with the given id.
-    InternalError:
-      description: An unexpected error occurred.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
-    Unauthenticated:
-      description: Missing or invalid API key.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/unauthenticated
-            title: Unauthenticated
-            status: 401
-            detail: Missing or invalid API key.
   schemas:
     NoticeSearchResponseDto:
       type: object
