@@ -259,6 +259,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: RateLimits
+  url: rate-limits/stotles-rate-limits.yml
 - type: Overlay
   url: overlays/stotles-public-api-overlay.yaml
 - type: AgentSkill
