@@ -114,3 +114,21 @@ agent_notes:
 - 'Discoverability gap worth reporting to the provider: Stotles serves an llms.txt at www.stotles.com/llms.txt
   that never mentions api.stotles.com, the OpenAPI, or the MCP server. An agent reading the published
   llms.txt would conclude Stotles has no programmable surface.'
+rfc9728:
+  endpoint: https://api.stotles.com/mcp
+  metadata_url: https://api.stotles.com/.well-known/oauth-protected-resource/mcp
+  discovered_via: WWW-Authenticate resource_metadata on an anonymous POST initialize
+  fetched: '2026-09-25'
+  http_status: 200
+  content_type: application/json
+  document:
+    resource: https://api.stotles.com/mcp
+    authorization_servers:
+    - https://app.stotles.com/api/auth
+    scopes_supported:
+    - mcp:read
+    - mcp:write
+    - offline_access
+    bearer_methods_supported:
+    - header
+    resource_name: Stotles MCP
