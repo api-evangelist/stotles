@@ -437,6 +437,41 @@ components:
             title: Unauthenticated
             status: 401
             detail: Missing or invalid API key.
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/not-found
+            title: Not found
+            status: 404
+            detail: No notice exists with the given id.
+    InternalError:
+      description: An unexpected error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/internal
+            title: Internal server error
+            status: 500
+    ValidationError:
+      description: The request failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://api.stotles.com/problems/validation
+            title: Request validation failed
+            status: 400
+            detail: The request parameters failed validation. See the 'errors' array for details.
+            errors:
+            - parameter: id
+              detail: Invalid uuid
     RateLimited:
       description: The client has sent too many requests in a given amount of time.
       headers:
@@ -453,41 +488,6 @@ components:
             title: Too many requests
             status: 429
             detail: Rate limit exceeded. Retry later.
-    InternalError:
-      description: An unexpected error occurred.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/internal
-            title: Internal server error
-            status: 500
-    NotFound:
-      description: The requested resource does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/not-found
-            title: Not found
-            status: 404
-            detail: No notice exists with the given id.
-    ValidationError:
-      description: The request failed validation.
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          example:
-            type: https://api.stotles.com/problems/validation
-            title: Request validation failed
-            status: 400
-            detail: The request parameters failed validation. See the 'errors' array for details.
-            errors:
-            - parameter: id
-              detail: Invalid uuid
   schemas:
     NoticeSearchResponseDto:
       type: object
