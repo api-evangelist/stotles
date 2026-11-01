@@ -64,6 +64,126 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Stotles is a company surfaced as a portfolio company of seedcamp, speedinvest and added to the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+Stotles is a B2G (business-to-government) public sector procurement and sales intelligence platform for the UK and Ireland. It aggregates procurement notices, contract awards, framework agreements, buyer spend history, and verified decision-maker contacts from public sources such as Find a Tender, Contracts Finder, Digital Marketplace, TED, and Public Contracts Scotland, then layers tender discovery, market intelligence, AI-assisted bid qualification (Bid Studio), account targeting (Sales Studio), and pipeline management on top so suppliers can find, qualify, and win government contracts. Delivered as a SaaS web application at app.stotles.com, and — since 2026 — as a programmable surface: the Stotles Public API is a documented OpenAPI 3.1.0 REST service at api.stotles.com/v1 covering notices, buyers, suppliers and framework agreements, alongside a hosted Model Context Protocol server at api.stotles.com/mcp that brings the same market data into AI chat tools and agents. Both authenticate with a static x-api-key header; keys are issued by a Customer Success Manager rather than self-serve, and MCP access is in beta behind a waitlist.
 
-Backed by: seedcamp, speedinvest — http://stotles.com
+**Areas:** Company · Procurement · Public Sector · Government · Tenders · Sales Intelligence · B2G · Market Intelligence · OpenAPI · MCP · Agent-Native · Contract Awards
+
+## Stotles on APIs.io
+
+Everything profiled for Stotles is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/stotles/](https://apis.io/providers/stotles/)** — or go straight to one of the APIs or properties below.
+
+### APIs (5)
+
+- [Stotles MCP Server](https://apis.io/apis/stotles/stotles-mcp-server/) — Hosted, remote Model Context Protocol server exposing Stotles public sector market data to AI chat tools and agents. Streamable-HTTP transport at…
+- [Stotles Buyers API](https://apis.io/apis/stotles/stotles-buyers-api/) — Public sector buyers and their procurement activity.
+- [Stotles Frameworks API](https://apis.io/apis/stotles/stotles-frameworks-api/) — Framework agreements and dynamic purchasing systems.
+- [Stotles Notices API](https://apis.io/apis/stotles/stotles-notices-api/) — Public sector procurement notices.
+- [Stotles Suppliers API](https://apis.io/apis/stotles/stotles-suppliers-api/) — Suppliers bidding for and winning public sector contracts.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Stotles MCP server](https://apis.io/servers/stotles/stotles-mcp-server/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Stotles Public Api Overlay](https://apis.io/overlays/stotles/stotles-public-api-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Stotles Authentication](https://apis.io/security/stotles/stotles-authentication/)
+- [Stotles Domain Security](https://apis.io/security/stotles/stotles-domain-security/)
+- [Stotles Trust Center](https://apis.io/security/stotles/stotles-trust-center/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Stotles Plans Pricing](https://apis.io/plans/stotles/stotles-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Stotles Rate Limits](https://apis.io/rate-limits/stotles/stotles-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.stotles.com)
+- [Documentation](https://help.stotles.com/)
+- [Getting started](https://app.stotles.com/get-started)
+- [Pricing](https://www.stotles.com/pricing)
+- [Sign up](https://app.stotles.com/get-started)
+- [Support](https://help.stotles.com/)
+- [Blog](https://www.stotles.com/resources)
+- [Compliance](https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm)
+- [Trust centre](https://app.eu.vanta.com/stotles.com/trust/xpcnkioxgcvk0i3qd7fm)
+- [Terms of service](https://www.stotles.com/terms-and-conditions)
+- [Privacy policy](https://www.stotles.com/privacy-policy)
+- [GitHub](https://github.com/Stotles)
+
+## API Evangelist rating
+
+**Kin Score 54.1** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 53.9 |
+| Contract governance | 18.2 |
+| Operational transparency | 31.6 |
+| Developer ergonomics | 49.4 |
+| Access clarity | 76.3 |
+
+**Agent readiness 60.4** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | na |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | na |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | verified |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | na |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 24.5** — Government & Public Sector
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/stotles/](https://apis.io/providers/stotles/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Stotles: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/stotles/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
